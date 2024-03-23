@@ -1,0 +1,15 @@
+[package]
+name = "space-shooter"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+bevy = "0.13.1"
+itertools = "0.12"
+rand = "0.8.5"
+bevy_asset_loader = { version = "0.20", features = ["2d"] }
+
+
+[features]
