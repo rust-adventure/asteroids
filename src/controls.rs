@@ -1,11 +1,11 @@
-use std::time::Duration;
-
 use crate::{
     assets::{space::SpaceSheet, ImageAssets},
     ship::PlayerShipType,
     GameState, Player,
 };
 use bevy::prelude::*;
+use bevy_xpbd_2d::prelude::*;
+use std::time::Duration;
 
 pub struct ControlsPlugin;
 
@@ -23,7 +23,7 @@ impl Plugin for ControlsPlugin {
 }
 
 #[derive(Component)]
-struct Laser(Vec2);
+pub struct Laser(Vec2);
 
 #[derive(Resource, Default, Deref, DerefMut)]
 struct MovementFactor(Vec2);
@@ -32,7 +32,6 @@ fn laser_movement(
     mut lasers: Query<(&mut Transform, &Laser)>,
     time: Res<Time>,
 ) {
-    // let base_speed = 100.;
     for (
         mut transform,
         Laser(preexisting_movement_factor),
@@ -48,6 +47,7 @@ fn laser_movement(
         transform.translation.y += translation_delta.y;
     }
 }
+
 fn player_movement_system(
     mut commands: Commands,
     time: Res<Time>,
@@ -73,14 +73,16 @@ fn player_movement_system(
         rotation_factor -= 1.0;
     }
 
-    // update the ship rotation around the Z axis (perpendicular to the 2D plane of the screen)
+    // update the ship rotation around the Z axis
+    // (perpendicular to the 2D plane of the screen)
     transform.rotate_z(
         rotation_factor
             * ship.base_ship_speed().rotation_speed
             * time.delta_seconds(),
     );
 
-    // get the ship's forward vector by applying the current rotation to the ships initial facing
+    // get the ship's forward vector by applying the
+    // current rotation to the ships initial facing
     // vector
     let user_facing_direction =
         transform.rotation * Vec3::Y;
@@ -114,6 +116,11 @@ fn player_movement_system(
                     index: 105,
                 },
                 Laser(movement_factor.clone()),
+                Collider::triangle(
+                    Vec2::new(0., -27.),
+                    Vec2::new(4.5, 27.),
+                    Vec2::new(-4.5, 27.),
+                ),
             ));
         }
     }
@@ -124,17 +131,22 @@ fn player_movement_system(
         .clamp(Vec2::splat(-1.0), Vec2::splat(1.0));
     } else {
         // decay movement factor?
-        // movement_factor.0 = (movement_factor.0 * 0.95)
-        //     .clamp(Vec2::splat(-1.0), Vec2::splat(1.0));
+        // movement_factor.0 = (movement_factor.0
+        // * 0.95)
+        //     .clamp(Vec2::splat(-1.0),
+        // Vec2::splat(1.0));
     }
-    // get the distance the ship will move based on direction, the ship's movement speed and delta
+    // get the distance the ship will move based on
+    // direction, the ship's movement speed and delta
     // time
     let movement_distance = movement_factor.0
         * ship.base_ship_speed().movement_speed
         * time.delta_seconds();
-    // create the change in translation using the new movement direction and distance
+    // create the change in translation using the new
+    // movement direction and distance
     let translation_delta = movement_distance;
-    // update the ship translation with our new translation delta
+    // update the ship translation with our new
+    // translation delta
     transform.translation.x += translation_delta.x;
     transform.translation.y += translation_delta.y;
 }

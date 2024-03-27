@@ -15,8 +15,8 @@ mod choose_ship;
 use self::{
     button::SpawnButton,
     // snake_selector::{
-    //     snake_selector_interaction, update_current_snake,
-    // },
+    //     snake_selector_interaction,
+    // update_current_snake, },
 };
 
 pub struct UiPlugin;
@@ -111,7 +111,8 @@ fn audio_state(
         if interaction == &Interaction::Pressed {
             if settings.audio == AudioSettings::ON {
                 // commands.spawn(AudioBundle {
-                //     source: sounds.apple.clone(),
+                //     source:
+                // sounds.apple.clone(),
                 //     ..default()
                 // });
             }

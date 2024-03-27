@@ -2089,7 +2089,7 @@ pub fn make_texture_atlas(
         space_sheet_dimensions,
     );
     for (index, tex) in sub_textures.iter().enumerate() {
-        if tex.name.starts_with("laser") {
+        if tex.name.starts_with("meteor") {
             dbg!(index, tex.name);
         }
         layout.add_texture(Rect::from_corners(

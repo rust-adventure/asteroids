@@ -29,15 +29,15 @@ impl PlayerShipType {
         match self {
             PlayerShipType::A => BaseShipSpeed {
                 movement_speed: 500.0, // meters per second
-                rotation_speed: f32::to_radians(360.0), // degrees per second
+                rotation_speed: f32::to_radians(360.0), /* degrees per second */
             },
             PlayerShipType::B => BaseShipSpeed {
                 movement_speed: 500.0, // meters per second
-                rotation_speed: f32::to_radians(360.0), // degrees per second
+                rotation_speed: f32::to_radians(360.0), /* degrees per second */
             },
             PlayerShipType::C => BaseShipSpeed {
                 movement_speed: 500.0, // meters per second
-                rotation_speed: f32::to_radians(360.0), // degrees per second
+                rotation_speed: f32::to_radians(360.0), /* degrees per second */
             },
         }
     }

@@ -10,6 +10,8 @@ bevy = "0.13.1"
 itertools = "0.12"
 rand = "0.8.5"
 bevy_asset_loader = { version = "0.20", features = ["2d"] }
+iyes_perf_ui = "0.2.3"
+bevy_xpbd_2d = { version = "0.4.2", features = ["debug-plugin"] }
 
 
 [features]
