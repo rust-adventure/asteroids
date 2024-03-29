@@ -3,6 +3,7 @@ use std::f32::consts::TAU;
 use crate::{
     assets::{space::SpaceSheet, ImageAssets},
     movement::{LinearMovement, Spin, WrappingMovement},
+    ui::pause::Pausable,
 };
 use bevy::prelude::*;
 use bevy_xpbd_2d::prelude::*;
@@ -14,7 +15,9 @@ impl Plugin for MeteorPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             PostUpdate,
-            meteor_destroyed_event_handler,
+            sandbox_meteor_destroyed_event_handler.run_if(
+                resource_equals(Pausable::NotPaused),
+            ),
         )
         .add_event::<MeteorDestroyed>();
     }
@@ -76,7 +79,7 @@ impl MeteorBundle {
                     rotation,
                 ),
             },
-            spin: Spin(Quat::from_rotation_z(0.1)),
+            spin: Spin(1.3),
             wrapping: WrappingMovement,
         }
     }
@@ -111,7 +114,7 @@ impl MeteorBundle {
                     rotation,
                 ),
             },
-            spin: Spin(Quat::from_rotation_z(0.1)),
+            spin: Spin(1.6),
             wrapping: WrappingMovement,
         }
     }
@@ -146,7 +149,7 @@ impl MeteorBundle {
                     rotation,
                 ),
             },
-            spin: Spin(Quat::from_rotation_z(0.1)),
+            spin: Spin(2.),
             wrapping: WrappingMovement,
         }
     }
@@ -159,7 +162,7 @@ pub struct MeteorDestroyed {
     pub destroyed_type: MeteorType,
 }
 
-fn meteor_destroyed_event_handler(
+fn sandbox_meteor_destroyed_event_handler(
     mut commands: Commands,
     images: Res<ImageAssets>,
     space_sheet_layout: Res<SpaceSheet>,
@@ -167,7 +170,7 @@ fn meteor_destroyed_event_handler(
     windows: Query<&Window>,
 ) {
     let Ok(window) = windows.get_single() else {
-        warn!("meteor_destroyed_event_handler requires a window to spawn, but no window was found (or multiple were found)");
+        warn!("sandbox_meteor_destroyed_event_handler requires a window to spawn, but no window was found (or multiple were found)");
         return;
     };
     let width = window.resolution.width();

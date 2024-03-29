@@ -16,8 +16,6 @@ pub struct SpaceSheet(pub Handle<TextureAtlasLayout>);
 pub fn make_texture_atlas(
     mut commands: Commands,
     mut atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
-    image_assets: Res<ImageAssets>,
-    images: Res<Assets<Image>>,
 ) {
     let sub_textures = vec![
         SubTexture {

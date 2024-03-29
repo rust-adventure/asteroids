@@ -1,14 +1,39 @@
 use bevy::prelude::*;
 
 use crate::{
-    assets::{
-        space::SpaceSheet, AudioAssets, FontAssets,
-        ImageAssets,
-    },
+    assets::{space::SpaceSheet, AudioAssets, ImageAssets},
     settings::{AudioSettings, GameSettings},
-    ship::{PlayerShipType, SpawnFrom},
+    ship::PlayerShipType,
     GameState,
 };
+
+pub struct ChooseShipPlugin;
+
+impl Plugin for ChooseShipPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_event::<ChooseShipEvent>()
+            .add_systems(
+                OnEnter(GameState::ChooseShip),
+                choose_ship_menu,
+            )
+            .add_systems(
+                Update,
+                choose_ship_button_system.run_if(in_state(
+                    GameState::ChooseShip,
+                )),
+            )
+            .add_systems(
+                OnExit(GameState::ChooseShip),
+                hide_ship_menu,
+            );
+    }
+}
+
+#[derive(Event)]
+pub struct ChooseShipEvent {
+    pub ship_type: PlayerShipType,
+    pub ship_menu_location: Transform,
+}
 
 #[derive(Component)]
 pub struct ChooseShipMenu;
@@ -123,6 +148,7 @@ pub fn choose_ship_button_system(
     settings: Res<GameSettings>,
     sounds: Res<AudioAssets>,
     mut next_state: ResMut<NextState<GameState>>,
+    mut choose_ship_events: EventWriter<ChooseShipEvent>,
 ) {
     for (interaction, ship_type, transform) in
         &mut interaction_query
@@ -138,11 +164,14 @@ pub fn choose_ship_button_system(
                     // });
                 }
                 // *color = PRESSED_BUTTON.into();
-                commands.insert_resource(ship_type.clone());
-                commands.insert_resource(SpawnFrom(
-                    transform.clone(),
-                ));
-                next_state.set(GameState::Playing);
+
+                choose_ship_events.send(ChooseShipEvent {
+                    ship_type: ship_type.clone(),
+                    ship_menu_location: transform.clone(),
+                });
+                // TODO: This state change needs to be generic based
+                // on which game type we're starting
+                next_state.set(GameState::PlayingSandbox);
             }
             Interaction::Hovered => {
                 if settings.audio == AudioSettings::ON {

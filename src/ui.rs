@@ -10,7 +10,8 @@ use crate::{
 use bevy::prelude::*;
 
 mod button;
-mod choose_ship;
+pub mod choose_ship;
+pub mod pause;
 // mod snake_selector;
 use self::{
     button::SpawnButton,
@@ -40,18 +41,6 @@ impl Plugin for UiPlugin {
                     // update_current_snake,
                 )
                     .run_if(in_state(GameState::Menu)),
-            )
-            .add_systems(
-                OnEnter(GameState::ChooseShip),
-                choose_ship::choose_ship_menu,
-            )
-            .add_systems(
-                Update,
-                choose_ship::choose_ship_button_system,
-            )
-            .add_systems(
-                OnExit(GameState::ChooseShip),
-                choose_ship::hide_ship_menu,
             );
     }
 }

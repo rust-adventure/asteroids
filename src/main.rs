@@ -6,6 +6,10 @@ use space_shooter::{
     meteors::{MeteorDestroyed, MeteorPlugin},
     movement::MovementPlugin,
     start_game,
+    ui::{
+        choose_ship::ChooseShipPlugin,
+        pause::{Pausable, PausePlugin},
+    },
 };
 use space_shooter::{
     assets::AssetsPlugin, controls::ControlsPlugin,
@@ -35,20 +39,23 @@ fn main() {
             PhysicsPlugins::default(),
             PhysicsDebugPlugin::default(),
             MeteorPlugin,
-            MovementPlugin
+            MovementPlugin,
+            ChooseShipPlugin,
+            PausePlugin
         ))
         .init_state::<GameState>()
         .insert_resource(Time::<Fixed>::from_seconds(0.1))
         .add_systems(Startup, make_texture_atlas)
         .add_systems(Startup, setup)
         .add_systems(
-            OnEnter(GameState::Playing),
+            OnEnter(GameState::PlayingSandbox),
             start_game,
         )
         .add_systems(
             Update,
             laser_meteor_collision
-                .run_if(in_state(GameState::Playing)),
+                .run_if(in_state(GameState::PlayingSandbox))
+                .run_if(resource_equals(Pausable::NotPaused)),
         )
         .run();
 }

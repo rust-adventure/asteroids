@@ -1,6 +1,7 @@
 use crate::{
     assets::{space::SpaceSheet, ImageAssets},
     ship::PlayerShipType,
+    ui::pause::Pausable,
     GameState, Player,
 };
 use bevy::prelude::*;
@@ -14,10 +15,14 @@ impl Plugin for ControlsPlugin {
         app.init_resource::<MovementFactor>().add_systems(
             Update,
             (
-                player_movement_system
-                    .run_if(in_state(GameState::Playing)),
+                player_movement_system.run_if(in_state(
+                    GameState::PlayingSandbox,
+                )),
                 laser_movement,
-            ),
+            )
+                .run_if(resource_equals(
+                    Pausable::NotPaused,
+                )),
         );
     }
 }
@@ -61,7 +66,14 @@ fn player_movement_system(
     space_sheet_layout: Res<SpaceSheet>,
     mut last_shot: Local<Option<Duration>>,
 ) {
-    let (mut transform, ship) = query.single_mut();
+    let Ok((mut transform, ship)) = query.get_single_mut()
+    else {
+        error!(
+            "Only expected one Player component. got {}",
+            query.iter().count()
+        );
+        return;
+    };
 
     let mut rotation_factor = 0.0;
 

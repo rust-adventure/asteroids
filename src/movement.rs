@@ -1,12 +1,17 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 
+use crate::ui::pause::Pausable;
+
 pub struct MovementPlugin;
 
 impl Plugin for MovementPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             Update,
-            (linear_movement, spin, wrapping_movement),
+            (linear_movement, spin, wrapping_movement)
+                .run_if(resource_equals(
+                    Pausable::NotPaused,
+                )),
         );
     }
 }
@@ -42,16 +47,14 @@ fn linear_movement(
 
 // TODO: Rotate2d
 #[derive(Component)]
-pub struct Spin(pub Quat);
+pub struct Spin(pub f32);
 
 fn spin(
     mut spinnable: Query<(&Spin, &mut Transform)>,
     time: Res<Time>,
 ) {
     for (spin, mut transform) in &mut spinnable {
-        transform.rotation = transform.rotation
-            * spin.0
-            * time.delta_seconds();
+        transform.rotate_z(spin.0 * time.delta_seconds());
     }
 }
 

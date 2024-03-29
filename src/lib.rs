@@ -1,17 +1,12 @@
 use assets::{space::SpaceSheet, ImageAssets};
-use bevy::math::bounding::{
-    Aabb2d, BoundingCircle, BoundingVolume,
-    IntersectsVolume,
-};
-use bevy::{prelude::*, render::primitives::Aabb};
+use bevy::prelude::*;
 use bevy_xpbd_2d::prelude::*;
 use controls::Laser;
-use itertools::Itertools;
 use meteors::{
     Meteor, MeteorBundle, MeteorDestroyed, MeteorType,
 };
 use movement::WrappingMovement;
-use ship::{PlayerShipType, SpawnFrom};
+use ui::choose_ship::ChooseShipEvent;
 
 pub mod assets;
 pub mod colors;
@@ -28,35 +23,48 @@ pub mod ui;
 pub enum GameState {
     #[default]
     Menu,
+    Pause,
     ChooseShip,
-    Playing,
+    PlayingSandbox,
 }
 
 #[derive(Component)]
 struct Player;
 
+// TODO: rename to start_sandbox
 pub fn start_game(
     mut commands: Commands,
     images: Res<ImageAssets>,
     space_sheet_layout: Res<SpaceSheet>,
-    player_ship_type: Res<PlayerShipType>,
+    // player_ship_type: Res<PlayerShipType>,
     // where the ship should spawn from before landing at
     // 0,0
-    spawn_from: Res<SpawnFrom>,
+    // spawn_from: Res<SpawnFrom>,
+    mut choose_ship_reader: EventReader<
+        ui::choose_ship::ChooseShipEvent,
+    >,
 ) {
+    let Some(ChooseShipEvent {
+        ship_type,
+        ship_menu_location,
+    }) = choose_ship_reader.read().next()
+    else {
+        warn!("No ChooseShipEvent coming from the menu; Check to make sure events are receivable.");
+        return;
+    };
     commands.spawn((
         SpriteBundle {
             // transform: Transform::from_xyz(0., 0., 1.),
-            transform: spawn_from.0,
+            transform: *ship_menu_location,
             texture: images.space_sheet.clone(),
             ..default()
         },
         TextureAtlas {
-            index: player_ship_type.base_atlas_index(),
+            index: ship_type.base_atlas_index(),
             layout: space_sheet_layout.0.clone(),
         },
         Player,
-        player_ship_type.clone(),
+        ship_type.clone(),
         WrappingMovement,
     ));
 
@@ -88,15 +96,11 @@ pub fn laser_meteor_collision(
         transform,
     ) in &meteors
     {
-        if colliding_entities.len() > 0 {
+        if !colliding_entities.is_empty() {
             for entity_laser in &lasers {
                 if colliding_entities
                     .contains(&entity_laser)
                 {
-                    println!(
-                        "Meteor {:?} was hit by laser {:?}",
-                        entity_meteor, entity_laser
-                    );
                     commands
                         .entity(entity_laser)
                         .despawn_recursive();

@@ -1,9 +1,6 @@
 use bevy::prelude::*;
 
-#[derive(Resource)]
-pub struct SpawnFrom(pub Transform);
-
-#[derive(Resource, Component, Clone)]
+#[derive(Component, Clone)]
 pub enum PlayerShipType {
     A,
     B,
