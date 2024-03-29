@@ -32,6 +32,8 @@ pub struct ImageAssets {
     pub box_unchecked: Handle<Image>,
     #[asset(path = "green_boxCheckmark.png")]
     pub box_checked: Handle<Image>,
+    #[asset(path = "glass_panel.png")]
+    pub panel_glass: Handle<Image>,
     #[asset(path = "pattern_blueprint.png")]
     pub pattern_blueprint: Handle<Image>,
     #[asset(path = "space_sheet.png")]

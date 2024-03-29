@@ -84,13 +84,6 @@ fn show_pause_menu(
     mut commands: Commands,
     images: Res<ImageAssets>,
 ) {
-    let slicer = TextureSlicer {
-        border: BorderRect::square(10.0),
-        center_scale_mode: SliceScaleMode::Stretch,
-        sides_scale_mode: SliceScaleMode::Stretch,
-        max_corner_scale: 1.0,
-    };
-
     let panel_slicer = TextureSlicer {
         border: BorderRect::square(20.0),
         center_scale_mode: SliceScaleMode::Stretch,
@@ -98,14 +91,14 @@ fn show_pause_menu(
         max_corner_scale: 1.0,
     };
 
-    let pause_menu_id = commands
+    let pause_text = commands
         .spawn((
             ImageBundle {
-                // style: styles::SCORE_CONTAINER,
-                image: images
-                    .pattern_blueprint
-                    .clone()
-                    .into(),
+                style: Style {
+                    padding: UiRect::all(Val::Px(20.)),
+                    ..default()
+                },
+                image: images.panel_glass.clone().into(),
                 ..default()
             },
             ImageScaleMode::Sliced(panel_slicer.clone()),
@@ -124,5 +117,25 @@ fn show_pause_menu(
             );
         })
         .id();
+
+    let pause_menu_id = commands
+        .spawn(NodeBundle {
+            background_color: Color::rgba(
+                0.95, 0.95, 1., 0.1,
+            )
+            .into(),
+            style: Style {
+                display: Display::Flex,
+                justify_content: JustifyContent::Center,
+                align_content: AlignContent::Center,
+                width: Val::Percent(100.),
+                align_self: AlignSelf::Center,
+                ..default()
+            },
+            ..default()
+        })
+        .add_child(pause_text)
+        .id();
+
     commands.insert_resource(PauseMenu(pause_menu_id));
 }

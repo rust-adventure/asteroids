@@ -147,17 +147,17 @@ pub fn pause_ui(
             MainMenu,
         ))
         .with_children(|parent| {
+            let panel_slicer = TextureSlicer {
+                border: BorderRect::square(20.0),
+                center_scale_mode: SliceScaleMode::Stretch,
+                sides_scale_mode: SliceScaleMode::Stretch,
+                max_corner_scale: 1.0,
+            };
+     
             parent
                 .spawn((
-                    NodeBundle {
-                        background_color: BackgroundColor(
-                            Color::Hsla {
-                                hue: 0.0,
-                                saturation: 0.0,
-                                lightness: 100.0,
-                                alpha: 0.4,
-                            },
-                        ),
+                    ImageBundle {
+                        image: images.panel_glass.clone().into(),
                         style: Style {
                             width: Val::Px(360.0),
                             height: Val::Px(500.0),
@@ -175,6 +175,7 @@ pub fn pause_ui(
                         },
                         ..default()
                     },
+                    ImageScaleMode::Sliced(panel_slicer.clone()),
                     MenuPage::Main,
                 ))
                 .with_children(|parent| {
@@ -194,16 +195,9 @@ pub fn pause_ui(
                 });
             parent
                 .spawn((
-                    NodeBundle {
+                    ImageBundle {
+                        image: images.panel_glass.clone().into(),
                         visibility: Visibility::Hidden,
-                        background_color: BackgroundColor(
-                            Color::Hsla {
-                                hue: 0.0,
-                                saturation: 0.0,
-                                lightness: 100.0,
-                                alpha: 0.4,
-                            },
-                        ),
                         style: Style {
                             width: Val::Px(360.0),
                             height: Val::Px(500.0),
@@ -218,6 +212,7 @@ pub fn pause_ui(
                         },
                         ..default()
                     },
+                    ImageScaleMode::Sliced(panel_slicer.clone()),
                     MenuPage::Settings,
                 ))
                 .with_children(|parent| {

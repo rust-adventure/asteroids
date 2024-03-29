@@ -1,6 +1,9 @@
 use super::MenuPage;
 use crate::{
-    assets::{AudioAssets, FontAssets},
+    assets::{
+        space::SpaceSheet, AudioAssets, FontAssets,
+        ImageAssets,
+    },
     settings::{AudioSettings, GameSettings},
     GameState,
 };
@@ -17,13 +20,13 @@ const NORMAL_BUTTON: Color = Color::Hsla {
 const HOVERED_BUTTON: Color = Color::Hsla {
     hue: 0.0,
     saturation: 0.0,
-    lightness: 0.25,
+    lightness: 0.90,
     alpha: 1.0,
 };
 const PRESSED_BUTTON: Color = Color::Hsla {
     hue: 0.0,
     saturation: 0.0,
-    lightness: 0.0,
+    lightness: 80.0,
     alpha: 1.0,
 };
 
@@ -99,7 +102,7 @@ pub fn text_button_system(
                 *color = HOVERED_BUTTON.into();
             }
             Interaction::None => {
-                *color = NORMAL_BUTTON.into();
+                *color = Color::WHITE.into();
             }
         }
     }
@@ -119,6 +122,24 @@ impl<T: Into<String> + Send + 'static> Command
             .unwrap()
             .alfa_slab_one_regular
             .clone();
+        let space_sheet_layout = world
+            .get_resource::<SpaceSheet>()
+            .unwrap()
+            .0
+            .clone();
+        let space_sheet = world
+            .get_resource::<ImageAssets>()
+            .unwrap()
+            .space_sheet
+            .clone();
+        // images: Res<ImageAssets>,
+
+        let panel_slicer = TextureSlicer {
+            border: BorderRect::square(20.0),
+            center_scale_mode: SliceScaleMode::Stretch,
+            sides_scale_mode: SliceScaleMode::Stretch,
+            max_corner_scale: 1.0,
+        };
 
         world
             .spawn((
@@ -134,9 +155,17 @@ impl<T: Into<String> + Send + 'static> Command
                         align_items: AlignItems::Center,
                         ..default()
                     },
-                    background_color: NORMAL_BUTTON.into(),
+                    // background_color: NORMAL_BUTTON.into(),
+                    image: space_sheet.into(),
                     ..default()
                 },
+                TextureAtlas {
+                    index: 12,
+                    layout: space_sheet_layout,
+                },
+                // ImageScaleMode::Sliced(
+                //     panel_slicer.clone(),
+                // ),
                 TextButton,
             ))
             .set_parent(self.parent)
@@ -146,7 +175,7 @@ impl<T: Into<String> + Send + 'static> Command
                     TextStyle {
                         font,
                         font_size: 40.0,
-                        color: Color::rgb(0.9, 0.9, 0.9),
+                        color: Color::rgb(0.1, 0.1, 0.14),
                     },
                 ));
             });
