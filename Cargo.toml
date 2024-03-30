@@ -12,6 +12,7 @@ rand = "0.8.5"
 bevy_asset_loader = { version = "0.20", features = ["2d"] }
 iyes_perf_ui = "0.2.3"
 bevy_xpbd_2d = { version = "0.4.2", features = ["debug-plugin"] }
+roxmltree = "0.19.0"
 
 
 [features]

@@ -11,6 +11,7 @@ use ui::choose_ship::ChooseShipEvent;
 pub mod assets;
 pub mod colors;
 pub mod controls;
+pub mod kenney_assets;
 pub mod meteors;
 pub mod movement;
 pub mod settings;

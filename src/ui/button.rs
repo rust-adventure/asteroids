@@ -132,14 +132,14 @@ impl<T: Into<String> + Send + 'static> Command
             .unwrap()
             .space_sheet
             .clone();
-        // images: Res<ImageAssets>,
 
-        let panel_slicer = TextureSlicer {
-            border: BorderRect::square(20.0),
-            center_scale_mode: SliceScaleMode::Stretch,
-            sides_scale_mode: SliceScaleMode::Stretch,
-            max_corner_scale: 1.0,
-        };
+        // TODO: TextureAtlas Panel Slicers? Does it work?
+        // let panel_slicer = TextureSlicer {
+        //     border: BorderRect::square(10.0),
+        //     center_scale_mode: SliceScaleMode::Stretch,
+        //     sides_scale_mode: SliceScaleMode::Stretch,
+        //     max_corner_scale: 1.0,
+        // };
 
         world
             .spawn((
