@@ -1,7 +1,8 @@
 use std::f32::consts::TAU;
 
 use crate::{
-    assets::{space::SpaceSheet, ImageAssets},
+    assets::ImageAssets,
+    kenney_assets::KenneySpriteSheetAsset,
     movement::{LinearMovement, Spin, WrappingMovement},
     ui::pause::Pausable,
 };
@@ -50,8 +51,7 @@ const METEOR_BASE_SPEED_SMALL: f32 = 1.4;
 impl MeteorBundle {
     pub fn big(
         transform: Transform,
-        images: &Res<ImageAssets>,
-        space_sheet_layout: Handle<TextureAtlasLayout>,
+        space_sheet: &KenneySpriteSheetAsset,
     ) -> MeteorBundle {
         let mut rng = rand::thread_rng();
         let x = rng.gen::<f32>() * METEOR_BASE_SPEED_BIG;
@@ -64,12 +64,14 @@ impl MeteorBundle {
             collider: Collider::circle(42.),
             sprite_bundle: SpriteBundle {
                 transform,
-                texture: images.space_sheet.clone(),
+                texture: space_sheet.sheet.clone(),
                 ..default()
             },
             texture_atlas: TextureAtlas {
                 index: 163,
-                layout: space_sheet_layout,
+                layout: space_sheet
+                    .texture_atlas_layout
+                    .clone(),
             },
             linear_movement: LinearMovement {
                 movement_factor: Vec2::new(
@@ -85,8 +87,7 @@ impl MeteorBundle {
     }
     pub fn medium(
         transform: Transform,
-        images: &Res<ImageAssets>,
-        space_sheet_layout: Handle<TextureAtlasLayout>,
+        space_sheet: &KenneySpriteSheetAsset,
     ) -> MeteorBundle {
         let mut rng = rand::thread_rng();
         let x = rng.gen::<f32>() * METEOR_BASE_SPEED_MEDIUM;
@@ -99,12 +100,14 @@ impl MeteorBundle {
             collider: Collider::circle(21.),
             sprite_bundle: SpriteBundle {
                 transform,
-                texture: images.space_sheet.clone(),
+                texture: space_sheet.sheet.clone(),
                 ..default()
             },
             texture_atlas: TextureAtlas {
                 index: 167,
-                layout: space_sheet_layout,
+                layout: space_sheet
+                    .texture_atlas_layout
+                    .clone(),
             },
             linear_movement: LinearMovement {
                 movement_factor: Vec2::new(
@@ -120,8 +123,7 @@ impl MeteorBundle {
     }
     pub fn small(
         transform: Transform,
-        images: &Res<ImageAssets>,
-        space_sheet_layout: Handle<TextureAtlasLayout>,
+        space_sheet: &KenneySpriteSheetAsset,
     ) -> MeteorBundle {
         let mut rng = rand::thread_rng();
         let x = rng.gen::<f32>() * METEOR_BASE_SPEED_SMALL;
@@ -134,12 +136,14 @@ impl MeteorBundle {
             collider: Collider::circle(14.),
             sprite_bundle: SpriteBundle {
                 transform,
-                texture: images.space_sheet.clone(),
+                texture: space_sheet.sheet.clone(),
                 ..default()
             },
             texture_atlas: TextureAtlas {
                 index: 169,
-                layout: space_sheet_layout,
+                layout: space_sheet
+                    .texture_atlas_layout
+                    .clone(),
             },
             linear_movement: LinearMovement {
                 movement_factor: Vec2::new(
@@ -164,9 +168,9 @@ pub struct MeteorDestroyed {
 fn sandbox_meteor_destroyed_event_handler(
     mut commands: Commands,
     images: Res<ImageAssets>,
-    space_sheet_layout: Res<SpaceSheet>,
     mut events: EventReader<MeteorDestroyed>,
     windows: Query<&Window>,
+    sheets: Res<Assets<KenneySpriteSheetAsset>>,
 ) {
     let Ok(window) = windows.get_single() else {
         warn!("sandbox_meteor_destroyed_event_handler requires a window to spawn, but no window was found (or multiple were found)");
@@ -174,6 +178,10 @@ fn sandbox_meteor_destroyed_event_handler(
     };
     let width = window.resolution.width();
     let height = window.resolution.height();
+
+    let space_sheet =
+        sheets.get(&images.space_sheet).unwrap();
+
     for MeteorDestroyed {
         destroyed_at,
         destroyed_type,
@@ -194,8 +202,7 @@ fn sandbox_meteor_destroyed_event_handler(
                                 + y as f32,
                             1.,
                         ),
-                        &images,
-                        space_sheet_layout.0.clone(),
+                        &space_sheet,
                     ));
                 }
             }
@@ -213,8 +220,7 @@ fn sandbox_meteor_destroyed_event_handler(
                                 + y as f32,
                             1.,
                         ),
-                        &images,
-                        space_sheet_layout.0.clone(),
+                        &space_sheet,
                     ));
                 }
             }
@@ -232,8 +238,7 @@ fn sandbox_meteor_destroyed_event_handler(
                     Transform::from_xyz(
                         x as f32, y as f32, 1.,
                     ),
-                    &images,
-                    space_sheet_layout.0.clone(),
+                    &space_sheet,
                 ));
             }
         }

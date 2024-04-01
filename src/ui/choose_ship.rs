@@ -1,7 +1,8 @@
 use bevy::prelude::*;
 
 use crate::{
-    assets::{space::SpaceSheet, AudioAssets, ImageAssets},
+    assets::{AudioAssets, ImageAssets},
+    kenney_assets::KenneySpriteSheetAsset,
     settings::{AudioSettings, GameSettings},
     ship::PlayerShipType,
     GameState,
@@ -54,7 +55,7 @@ pub fn hide_ship_menu(
 pub fn choose_ship_menu(
     mut commands: Commands,
     images: Res<ImageAssets>,
-    space_sheet_layout: Res<SpaceSheet>,
+    sheets: Res<Assets<KenneySpriteSheetAsset>>,
     mut choose_ship_menu: Query<
         &mut Visibility,
         With<ChooseShipMenu>,
@@ -65,22 +66,24 @@ pub fn choose_ship_menu(
         *visibility = Visibility::Visible;
         return;
     }
+    let space_sheet =
+        sheets.get(&images.space_sheet).unwrap();
     let ships: Vec<_> = PlayerShipType::all_ships()
         .into_iter()
         .map(|ship_type| {
             let ship = commands
                 .spawn((
                     ImageBundle {
-                        image: images
-                            .space_sheet
+                        image: space_sheet
+                            .sheet
                             .clone()
                             .into(),
                         ..default()
                     },
                     TextureAtlas {
                         index: ship_type.base_atlas_index(),
-                        layout: space_sheet_layout
-                            .0
+                        layout: space_sheet
+                            .texture_atlas_layout
                             .clone(),
                     },
                 ))

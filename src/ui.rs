@@ -1,6 +1,6 @@
 use crate::{
     assets::{
-        space::SpaceSheet, AudioAssets, FontAssets,
+        AudioAssets, FontAssets,
         ImageAssets,
     },
     colors,
@@ -123,7 +123,6 @@ pub fn pause_ui(
     images: Res<ImageAssets>,
     atlases: Res<Assets<TextureAtlasLayout>>,
     fonts: Res<FontAssets>,
-    space_sheet_layout: Res<SpaceSheet>,
 ) {
     commands
         .spawn((

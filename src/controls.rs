@@ -1,8 +1,8 @@
 use crate::{
-    assets::{space::SpaceSheet, ImageAssets},
-    ship::PlayerShipType,
-    ui::pause::Pausable,
-    GameState, Player,
+    assets::ImageAssets,
+    kenney_assets::KenneySpriteSheetAsset,
+    ship::PlayerShipType, ui::pause::Pausable, GameState,
+    Player,
 };
 use bevy::prelude::*;
 use bevy_xpbd_2d::prelude::*;
@@ -62,7 +62,7 @@ fn player_movement_system(
     >,
     mut movement_factor: ResMut<MovementFactor>,
     images: Res<ImageAssets>,
-    space_sheet_layout: Res<SpaceSheet>,
+    sheets: Res<Assets<KenneySpriteSheetAsset>>,
     mut last_shot: Local<Option<Duration>>,
 ) {
     let Ok((mut transform, ship)) = query.get_single_mut()
@@ -73,7 +73,8 @@ fn player_movement_system(
         );
         return;
     };
-
+    let space_sheet =
+        sheets.get(&images.space_sheet).unwrap();
     let mut rotation_factor = 0.0;
 
     if keyboard_input.pressed(KeyCode::ArrowLeft) {
@@ -119,11 +120,13 @@ fn player_movement_system(
             commands.spawn((
                 SpriteBundle {
                     transform: transform.clone(),
-                    texture: images.space_sheet.clone(),
+                    texture: space_sheet.sheet.clone(),
                     ..default()
                 },
                 TextureAtlas {
-                    layout: space_sheet_layout.0.clone(),
+                    layout: space_sheet
+                        .texture_atlas_layout
+                        .clone(),
                     index: 105,
                 },
                 Laser(movement_factor.clone()),

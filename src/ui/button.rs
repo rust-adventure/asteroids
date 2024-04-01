@@ -1,9 +1,7 @@
 use super::MenuPage;
 use crate::{
-    assets::{
-        space::SpaceSheet, AudioAssets, FontAssets,
-        ImageAssets,
-    },
+    assets::{AudioAssets, FontAssets, ImageAssets},
+    kenney_assets::KenneySpriteSheetAsset,
     settings::{AudioSettings, GameSettings},
     GameState,
 };
@@ -118,16 +116,14 @@ impl<T: Into<String> + Send + 'static> Command
             .unwrap()
             .alfa_slab_one_regular
             .clone();
-        let space_sheet_layout = world
-            .get_resource::<SpaceSheet>()
-            .unwrap()
-            .0
-            .clone();
-        let space_sheet = world
-            .get_resource::<ImageAssets>()
-            .unwrap()
-            .space_sheet
-            .clone();
+        let space_sheet = {
+            let images = world
+                .get_resource::<ImageAssets>()
+                .unwrap();
+
+            let spritesheets = world.get_resource::<Assets<KenneySpriteSheetAsset>>().unwrap();
+            spritesheets.get(&images.space_sheet).unwrap()
+        };
 
         // TODO: TextureAtlas Panel Slicers? Does it work?
         // let panel_slicer = TextureSlicer {
@@ -152,12 +148,14 @@ impl<T: Into<String> + Send + 'static> Command
                         ..default()
                     },
                     // background_color: NORMAL_BUTTON.into(),
-                    image: space_sheet.into(),
+                    image: space_sheet.sheet.clone().into(),
                     ..default()
                 },
                 TextureAtlas {
                     index: 12,
-                    layout: space_sheet_layout,
+                    layout: space_sheet
+                        .texture_atlas_layout
+                        .clone(),
                 },
                 // ImageScaleMode::Sliced(
                 //     panel_slicer.clone(),

@@ -1,6 +1,9 @@
 use bevy::prelude::*;
 use bevy_asset_loader::prelude::*;
-pub mod space;
+
+use crate::kenney_assets::{
+    KenneyAssetPlugin, KenneySpriteSheetAsset,
+};
 
 pub struct AssetsPlugin;
 
@@ -8,7 +11,8 @@ impl Plugin for AssetsPlugin {
     fn build(&self, app: &mut App) {
         app.init_collection::<ImageAssets>()
             .init_collection::<AudioAssets>()
-            .init_collection::<FontAssets>();
+            .init_collection::<FontAssets>()
+            .add_plugins(KenneyAssetPlugin);
     }
 }
 
@@ -36,6 +40,6 @@ pub struct ImageAssets {
     pub panel_glass: Handle<Image>,
     #[asset(path = "pattern_blueprint.png")]
     pub pattern_blueprint: Handle<Image>,
-    #[asset(path = "space_sheet.png")]
-    pub space_sheet: Handle<Image>,
+    #[asset(path = "space_sheet.xml")]
+    pub space_sheet: Handle<KenneySpriteSheetAsset>,
 }

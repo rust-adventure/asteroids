@@ -1,7 +1,10 @@
 use bevy::prelude::*;
 use bevy_xpbd_2d::prelude::*;
 use space_shooter::{
-    assets::space::make_texture_atlas,
+    assets::AssetsPlugin, controls::ControlsPlugin,
+    settings::SettingsPlugin, ui::UiPlugin, GameState,
+};
+use space_shooter::{
     laser_meteor_collision,
     meteors::MeteorPlugin,
     movement::MovementPlugin,
@@ -10,10 +13,6 @@ use space_shooter::{
         choose_ship::ChooseShipPlugin,
         pause::{Pausable, PausePlugin},
     },
-};
-use space_shooter::{
-    assets::AssetsPlugin, controls::ControlsPlugin,
-    settings::SettingsPlugin, ui::UiPlugin, GameState,
 };
 
 fn main() {
@@ -41,7 +40,6 @@ fn main() {
             PausePlugin,
         ))
         .init_state::<GameState>()
-        .add_systems(Startup, make_texture_atlas)
         .add_systems(Startup, setup)
         .add_systems(
             OnEnter(GameState::Playing),

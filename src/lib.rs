@@ -1,7 +1,8 @@
-use assets::{space::SpaceSheet, ImageAssets};
+use assets::ImageAssets;
 use bevy::prelude::*;
 use bevy_xpbd_2d::prelude::*;
 use controls::Laser;
+use kenney_assets::KenneySpriteSheetAsset;
 use meteors::{
     Meteor, MeteorBundle, MeteorDestroyed, MeteorType,
 };
@@ -35,7 +36,7 @@ struct Player;
 pub fn start_game(
     mut commands: Commands,
     images: Res<ImageAssets>,
-    space_sheet_layout: Res<SpaceSheet>,
+    sheets: Res<Assets<KenneySpriteSheetAsset>>,
     // player_ship_type: Res<PlayerShipType>,
     // where the ship should spawn from before landing at
     // 0,0
@@ -52,16 +53,21 @@ pub fn start_game(
         warn!("No ChooseShipEvent coming from the menu; Check to make sure events are receivable.");
         return;
     };
+    let space_sheet =
+        sheets.get(&images.space_sheet).unwrap();
+
     commands.spawn((
         SpriteBundle {
             // transform: Transform::from_xyz(0., 0., 1.),
             transform: *ship_menu_location,
-            texture: images.space_sheet.clone(),
+            texture: space_sheet.sheet.clone(),
             ..default()
         },
         TextureAtlas {
             index: ship_type.base_atlas_index(),
-            layout: space_sheet_layout.0.clone(),
+            layout: space_sheet
+                .texture_atlas_layout
+                .clone(),
         },
         Player,
         ship_type.clone(),
@@ -70,8 +76,7 @@ pub fn start_game(
 
     commands.spawn(MeteorBundle::big(
         Transform::from_xyz(50., 0., 1.),
-        &images,
-        space_sheet_layout.0.clone(),
+        &space_sheet,
     ));
 }
 
