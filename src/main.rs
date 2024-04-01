@@ -3,7 +3,7 @@ use bevy_xpbd_2d::prelude::*;
 use space_shooter::{
     assets::space::make_texture_atlas,
     laser_meteor_collision,
-    meteors::{MeteorDestroyed, MeteorPlugin},
+    meteors::MeteorPlugin,
     movement::MovementPlugin,
     start_game,
     ui::{

@@ -154,7 +154,6 @@ impl MeteorBundle {
         }
     }
 }
-// 163
 
 #[derive(Event)]
 pub struct MeteorDestroyed {
@@ -175,7 +174,6 @@ fn sandbox_meteor_destroyed_event_handler(
     };
     let width = window.resolution.width();
     let height = window.resolution.height();
-    // dbg!(width, height);
     for MeteorDestroyed {
         destroyed_at,
         destroyed_type,

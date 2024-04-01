@@ -12,13 +12,7 @@ use bevy::prelude::*;
 mod button;
 pub mod choose_ship;
 pub mod pause;
-// mod snake_selector;
-use self::{
-    button::SpawnButton,
-    // snake_selector::{
-    //     snake_selector_interaction,
-    // update_current_snake, },
-};
+use button::SpawnButton;
 
 pub struct UiPlugin;
 
@@ -265,15 +259,6 @@ pub fn pause_ui(
                             );
                         });
 
-                    // snake_selector::spawn_snake_selector(
-                    //     parent,
-                    //     images,
-                    //     0,
-                    //     &atlases,
-                    //     &fonts,
-                    //     space_sheet_layout.clone()
-
-                    // );
                 });
         });
 }
