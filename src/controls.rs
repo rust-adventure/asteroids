@@ -15,9 +15,8 @@ impl Plugin for ControlsPlugin {
         app.init_resource::<MovementFactor>().add_systems(
             Update,
             (
-                player_movement_system.run_if(in_state(
-                    GameState::PlayingSandbox,
-                )),
+                player_movement_system
+                    .run_if(in_state(GameState::Playing)),
                 laser_movement,
             )
                 .run_if(resource_equals(

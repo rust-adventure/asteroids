@@ -169,9 +169,7 @@ pub fn choose_ship_button_system(
                     ship_type: ship_type.clone(),
                     ship_menu_location: transform.clone(),
                 });
-                // TODO: This state change needs to be generic based
-                // on which game type we're starting
-                next_state.set(GameState::PlayingSandbox);
+                next_state.set(GameState::Playing);
             }
             Interaction::Hovered => {
                 if settings.audio == AudioSettings::ON {

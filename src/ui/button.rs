@@ -11,12 +11,6 @@ use bevy::{
     app::AppExit, ecs::system::Command, prelude::*,
 };
 
-const NORMAL_BUTTON: Color = Color::Hsla {
-    hue: 0.0,
-    saturation: 0.0,
-    lightness: 0.0,
-    alpha: 1.0,
-};
 const HOVERED_BUTTON: Color = Color::Hsla {
     hue: 0.0,
     saturation: 0.0,
@@ -38,6 +32,8 @@ pub fn text_button_system(
     mut interaction_query: Query<
         (
             &Interaction,
+            // in 0.14, BackgroundColor is no longer used for tinting
+            // https://github.com/bevyengine/bevy/pull/11165
             &mut BackgroundColor,
             &Children,
         ),

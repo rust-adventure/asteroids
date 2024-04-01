@@ -24,9 +24,8 @@ pub mod ui;
 pub enum GameState {
     #[default]
     Menu,
-    Pause,
     ChooseShip,
-    PlayingSandbox,
+    Playing,
 }
 
 #[derive(Component)]

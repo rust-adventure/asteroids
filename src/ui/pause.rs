@@ -8,9 +8,8 @@ impl Plugin for PausePlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             Update,
-            pausable.run_if(in_state(
-                GameState::PlayingSandbox,
-            )),
+            handle_pause_toggle
+                .run_if(in_state(GameState::Playing)),
         )
         .add_systems(
             Update,
@@ -41,7 +40,7 @@ pub enum Pausable {
 #[derive(Resource)]
 struct PauseMenu(Entity);
 
-fn pausable(
+fn handle_pause_toggle(
     input: Res<ButtonInput<KeyCode>>,
     mut pausable: ResMut<Pausable>,
 ) {
@@ -52,6 +51,7 @@ fn pausable(
         }
     }
 }
+
 /// A [Condition](http://localhost:8000/bevy/ecs/prelude/trait.Condition.html) that enables systems running when the app is paused.
 /// Likely used with [not](http://localhost:8000/bevy/ecs/schedule/common_conditions/fn.not.html)
 ///

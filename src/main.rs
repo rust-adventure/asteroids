@@ -41,17 +41,16 @@ fn main() {
             PausePlugin,
         ))
         .init_state::<GameState>()
-        .insert_resource(Time::<Fixed>::from_seconds(0.1))
         .add_systems(Startup, make_texture_atlas)
         .add_systems(Startup, setup)
         .add_systems(
-            OnEnter(GameState::PlayingSandbox),
+            OnEnter(GameState::Playing),
             start_game,
         )
         .add_systems(
             Update,
             laser_meteor_collision
-                .run_if(in_state(GameState::PlayingSandbox))
+                .run_if(in_state(GameState::Playing))
                 .run_if(resource_equals(
                     Pausable::NotPaused,
                 )),
