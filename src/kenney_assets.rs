@@ -161,6 +161,6 @@ impl AssetLoader for KenneySpriteSheetAssetLoader {
     }
 
     fn extensions(&self) -> &[&str] {
-        &[".xml"]
+        &["xml"]
     }
 }
