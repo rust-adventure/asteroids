@@ -21,17 +21,14 @@ fn main() {
         .insert_resource(ClearColor(Color::rgb(
             0., 0., 0.1,
         )))
-        .add_plugins((DefaultPlugins.set(WindowPlugin {
-            primary_window: Some(Window {
-                title: "Space!".into(),
+        .add_plugins((
+            DefaultPlugins.set(WindowPlugin {
+                primary_window: Some(Window {
+                    title: "Asteroids!".into(),
+                    ..default()
+                }),
                 ..default()
             }),
-            ..default()
-            }),
-            bevy::diagnostic::FrameTimeDiagnosticsPlugin,
-            bevy::diagnostic::EntityCountDiagnosticsPlugin,
-            bevy::diagnostic::SystemInformationDiagnosticsPlugin,
-            iyes_perf_ui::PerfUiPlugin,
             SettingsPlugin,
             ControlsPlugin,
             AssetsPlugin,
@@ -41,7 +38,7 @@ fn main() {
             MeteorPlugin,
             MovementPlugin,
             ChooseShipPlugin,
-            PausePlugin
+            PausePlugin,
         ))
         .init_state::<GameState>()
         .insert_resource(Time::<Fixed>::from_seconds(0.1))
@@ -55,16 +52,13 @@ fn main() {
             Update,
             laser_meteor_collision
                 .run_if(in_state(GameState::PlayingSandbox))
-                .run_if(resource_equals(Pausable::NotPaused)),
+                .run_if(resource_equals(
+                    Pausable::NotPaused,
+                )),
         )
         .run();
 }
 
 fn setup(mut commands: Commands) {
     commands.spawn(Camera2dBundle::default());
-    // create a simple Perf UI with default settings
-    // and all entries provided by the crate:
-    commands.spawn(
-        iyes_perf_ui::PerfUiCompleteBundle::default(),
-    );
 }
