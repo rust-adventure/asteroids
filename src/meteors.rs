@@ -5,6 +5,7 @@ use crate::{
     kenney_assets::KenneySpriteSheetAsset,
     movement::{LinearMovement, Spin, WrappingMovement},
     ui::pause::Pausable,
+    GameState,
 };
 use bevy::prelude::*;
 use bevy_xpbd_2d::prelude::*;
@@ -16,9 +17,11 @@ impl Plugin for MeteorPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             PostUpdate,
-            sandbox_meteor_destroyed_event_handler.run_if(
-                resource_equals(Pausable::NotPaused),
-            ),
+            sandbox_meteor_destroyed_event_handler
+                .run_if(resource_equals(
+                    Pausable::NotPaused,
+                ))
+                .run_if(in_state(GameState::Playing)),
         )
         .add_event::<MeteorDestroyed>();
     }
@@ -179,8 +182,11 @@ fn sandbox_meteor_destroyed_event_handler(
     let width = window.resolution.width();
     let height = window.resolution.height();
 
-    let space_sheet =
-        sheets.get(&images.space_sheet).unwrap();
+    let Some(space_sheet) = sheets.get(&images.space_sheet)
+    else {
+        warn!("sandbox_meteor_destroyed_event_handler requires meteor sprites to be loaded");
+        return;
+    };
 
     for MeteorDestroyed {
         destroyed_at,

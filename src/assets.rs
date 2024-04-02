@@ -1,18 +1,25 @@
 use bevy::prelude::*;
 use bevy_asset_loader::prelude::*;
 
-use crate::kenney_assets::{
-    KenneyAssetPlugin, KenneySpriteSheetAsset,
+use crate::{
+    kenney_assets::{
+        KenneyAssetPlugin, KenneySpriteSheetAsset,
+    },
+    GameState,
 };
 
 pub struct AssetsPlugin;
 
 impl Plugin for AssetsPlugin {
     fn build(&self, app: &mut App) {
-        app.init_collection::<ImageAssets>()
-            .init_collection::<AudioAssets>()
-            .init_collection::<FontAssets>()
-            .add_plugins(KenneyAssetPlugin);
+        app.add_plugins(KenneyAssetPlugin)
+            .add_loading_state(
+                LoadingState::new(GameState::AssetLoading)
+                    .continue_to_state(GameState::Menu)
+                    .load_collection::<ImageAssets>()
+                    .load_collection::<AudioAssets>()
+                    .load_collection::<FontAssets>(),
+            );
     }
 }
 

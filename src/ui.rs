@@ -19,13 +19,19 @@ pub struct UiPlugin;
 impl Plugin for UiPlugin {
     fn build(&self, app: &mut bevy::prelude::App) {
         app.insert_resource(MenuPage::Main)
-            .add_systems(PostStartup, pause_ui)
+            .add_systems(
+                OnExit(GameState::AssetLoading),
+                main_menu
+            )
             .add_systems(
                 OnEnter(GameState::Menu),
                 show_menu,
             )
             .add_systems(OnExit(GameState::Menu), hide_menu)
-            .add_systems(Update, button::text_button_system)
+            .add_systems(Update,
+                button::text_button_system
+                    .run_if(not(in_state(GameState::AssetLoading)))
+            )
             .add_systems(
                 Update,
                 (
@@ -118,10 +124,9 @@ fn audio_state(
 #[derive(Component)]
 struct AudioSettingsCheckbox;
 
-pub fn pause_ui(
+pub fn main_menu(
     mut commands: Commands,
     images: Res<ImageAssets>,
-    atlases: Res<Assets<TextureAtlasLayout>>,
     fonts: Res<FontAssets>,
 ) {
     commands
@@ -210,10 +215,10 @@ pub fn pause_ui(
                 ))
                 .with_children(|parent| {
                     let entity = parent.parent_entity();
-                    parent.add_command(SpawnButton{
-                        parent: entity,
-                        text: "Back"
-                    });
+                    // parent.add_command(SpawnButton{
+                    //     parent: entity,
+                    //     text: "Back"
+                    // });
                     parent
                         .spawn(NodeBundle {
                             style: Style {

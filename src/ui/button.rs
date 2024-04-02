@@ -119,10 +119,15 @@ impl<T: Into<String> + Send + 'static> Command
         let space_sheet = {
             let images = world
                 .get_resource::<ImageAssets>()
-                .unwrap();
+                .expect("image assets to have been loaded");
 
-            let spritesheets = world.get_resource::<Assets<KenneySpriteSheetAsset>>().unwrap();
-            spritesheets.get(&images.space_sheet).unwrap()
+            let spritesheets = world
+                .get_resource::<Assets<KenneySpriteSheetAsset>>()
+                .expect("sprite sheet assets collection to exist");
+
+            spritesheets
+                .get(&images.space_sheet)
+                .expect("expect space sheet to have loaded")
         };
 
         // TODO: TextureAtlas Panel Slicers? Does it work?

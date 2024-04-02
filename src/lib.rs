@@ -24,6 +24,7 @@ pub mod ui;
 )]
 pub enum GameState {
     #[default]
+    AssetLoading,
     Menu,
     ChooseShip,
     Playing,
