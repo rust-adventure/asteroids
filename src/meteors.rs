@@ -208,7 +208,7 @@ fn sandbox_meteor_destroyed_event_handler(
                                 + y as f32,
                             1.,
                         ),
-                        &space_sheet,
+                        space_sheet,
                     ));
                 }
             }
@@ -226,7 +226,7 @@ fn sandbox_meteor_destroyed_event_handler(
                                 + y as f32,
                             1.,
                         ),
-                        &space_sheet,
+                        space_sheet,
                     ));
                 }
             }
@@ -244,7 +244,7 @@ fn sandbox_meteor_destroyed_event_handler(
                     Transform::from_xyz(
                         x as f32, y as f32, 1.,
                     ),
-                    &space_sheet,
+                    space_sheet,
                 ));
             }
         }

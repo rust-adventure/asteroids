@@ -77,7 +77,7 @@ pub fn start_game(
 
     commands.spawn(MeteorBundle::big(
         Transform::from_xyz(50., 0., 1.),
-        &space_sheet,
+        space_sheet,
     ));
 }
 

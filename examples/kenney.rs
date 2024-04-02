@@ -47,7 +47,7 @@ fn print_on_load(
     info!("image {:?}", kenney_sheet.sheet);
     info!(
         "first texture: {:?}",
-        kenney_sheet.textures.iter().next()
+        kenney_sheet.textures.first()
     );
 
     commands.spawn(Camera2dBundle::default());

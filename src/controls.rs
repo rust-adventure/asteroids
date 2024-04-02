@@ -102,13 +102,7 @@ fn player_movement_system(
     if keyboard_input.pressed(KeyCode::Space) {
         let can_shoot = last_shot.is_none() || {
             if let Some(shot) = *last_shot {
-                if time.elapsed() - shot
-                    > Duration::from_millis(200)
-                {
-                    true
-                } else {
-                    false
-                }
+                time.elapsed() - shot > Duration::from_millis(200)
             } else {
                 false
             }
@@ -119,7 +113,7 @@ fn player_movement_system(
 
             commands.spawn((
                 SpriteBundle {
-                    transform: transform.clone(),
+                    transform: *transform,
                     texture: space_sheet.sheet.clone(),
                     ..default()
                 },
@@ -129,7 +123,7 @@ fn player_movement_system(
                         .clone(),
                     index: 105,
                 },
-                Laser(movement_factor.clone()),
+                Laser(**movement_factor),
                 Collider::triangle(
                     Vec2::new(0., -27.),
                     Vec2::new(4.5, 27.),
