@@ -215,10 +215,10 @@ pub fn main_menu(
                 ))
                 .with_children(|parent| {
                     let entity = parent.parent_entity();
-                    // parent.add_command(SpawnButton{
-                    //     parent: entity,
-                    //     text: "Back"
-                    // });
+                    parent.add_command(SpawnButton{
+                        parent: entity,
+                        text: "Back"
+                    });
                     parent
                         .spawn(NodeBundle {
                             style: Style {
