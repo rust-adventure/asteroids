@@ -170,7 +170,7 @@ pub fn choose_ship_button_system(
 
                 choose_ship_events.send(ChooseShipEvent {
                     ship_type: ship_type.clone(),
-                    ship_menu_location: transform.clone(),
+                    ship_menu_location: *transform,
                 });
                 next_state.set(GameState::Playing);
             }
