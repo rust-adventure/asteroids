@@ -188,6 +188,8 @@ fn sandbox_meteor_destroyed_event_handler(
         return;
     };
 
+    let mut rng = rand::thread_rng();
+
     for MeteorDestroyed {
         destroyed_at,
         destroyed_type,
@@ -197,7 +199,6 @@ fn sandbox_meteor_destroyed_event_handler(
             MeteorType::Big => {
                 // become two medium
                 for _ in 0..2 {
-                    let mut rng = rand::thread_rng();
                     let x: i32 = rng.gen_range(-5..5);
                     let y: i32 = rng.gen_range(-5..5);
                     commands.spawn(MeteorBundle::medium(
@@ -215,7 +216,6 @@ fn sandbox_meteor_destroyed_event_handler(
             MeteorType::Medium => {
                 // become two smol
                 for _ in 0..2 {
-                    let mut rng = rand::thread_rng();
                     let x: i32 = rng.gen_range(-5..5);
                     let y: i32 = rng.gen_range(-5..5);
                     commands.spawn(MeteorBundle::small(
@@ -232,7 +232,6 @@ fn sandbox_meteor_destroyed_event_handler(
             }
             MeteorType::Small => {
                 // do nothing
-                let mut rng = rand::thread_rng();
                 let x: i32 = rng.gen_range(
                     (-width as i32 / 2)..(width as i32 / 2),
                 );
