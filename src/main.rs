@@ -1,4 +1,11 @@
-use bevy::prelude::*;
+use bevy::{
+    prelude::*,
+    render::{
+        settings::{WgpuFeatures, WgpuSettings},
+        RenderPlugin,
+    },
+};
+use bevy_hanabi::prelude::*;
 use bevy_xpbd_2d::prelude::*;
 use space_shooter::{
     assets::AssetsPlugin, controls::ControlsPlugin,
@@ -16,18 +23,29 @@ use space_shooter::{
 };
 
 fn main() {
+    let mut wgpu_settings = WgpuSettings::default();
+    wgpu_settings.features.set(
+        WgpuFeatures::VERTEX_WRITABLE_STORAGE,
+        true,
+    );
+
     App::new()
         .insert_resource(ClearColor(Color::rgb(
             0., 0., 0.1,
         )))
         .add_plugins((
-            DefaultPlugins.set(WindowPlugin {
-                primary_window: Some(Window {
-                    title: "Asteroids!".into(),
+            DefaultPlugins
+                .set(WindowPlugin {
+                    primary_window: Some(Window {
+                        title: "Asteroids!".into(),
+                        ..default()
+                    }),
                     ..default()
+                })
+                .set(RenderPlugin {
+                    render_creation: wgpu_settings.into(),
+                    synchronous_pipeline_compilation: false,
                 }),
-                ..default()
-            }),
             SettingsPlugin,
             ControlsPlugin,
             AssetsPlugin,
@@ -38,6 +56,7 @@ fn main() {
             MovementPlugin,
             ChooseShipPlugin,
             PausePlugin,
+            HanabiPlugin,
         ))
         .init_state::<GameState>()
         .add_systems(Startup, setup)
