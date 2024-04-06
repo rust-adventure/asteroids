@@ -9,7 +9,9 @@ use bevy_hanabi::prelude::*;
 use bevy_xpbd_2d::prelude::*;
 use space_shooter::{
     assets::AssetsPlugin, controls::ControlsPlugin,
-    settings::SettingsPlugin, ui::UiPlugin, GameState,
+    lives::LifePlugin, settings::SettingsPlugin,
+    ship::ShipPlugin, ship_meteor_collision, ui::UiPlugin,
+    GameState,
 };
 use space_shooter::{
     laser_meteor_collision,
@@ -57,6 +59,8 @@ fn main() {
             ChooseShipPlugin,
             PausePlugin,
             HanabiPlugin,
+            ShipPlugin,
+            LifePlugin,
         ))
         .init_state::<GameState>()
         .add_systems(Startup, setup)
@@ -66,7 +70,10 @@ fn main() {
         )
         .add_systems(
             Update,
-            laser_meteor_collision
+            (
+                laser_meteor_collision,
+                ship_meteor_collision,
+            )
                 .run_if(in_state(GameState::Playing))
                 .run_if(resource_equals(
                     Pausable::NotPaused,

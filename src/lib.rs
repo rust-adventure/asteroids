@@ -7,12 +7,14 @@ use meteors::{
     Meteor, MeteorBundle, MeteorDestroyed, MeteorType,
 };
 use movement::WrappingMovement;
+use ship::{PlayerShipType, ShipBundle, ShipDestroyed};
 use ui::choose_ship::ChooseShipEvent;
 
 pub mod assets;
 pub mod colors;
 pub mod controls;
 pub mod kenney_assets;
+pub mod lives;
 pub mod meteors;
 pub mod movement;
 pub mod settings;
@@ -31,7 +33,7 @@ pub enum GameState {
 }
 
 #[derive(Component)]
-struct Player;
+pub struct Player;
 
 // TODO: rename to start_sandbox
 pub fn start_game(
@@ -57,23 +59,24 @@ pub fn start_game(
     let space_sheet =
         sheets.get(&images.space_sheet).unwrap();
 
-    commands.spawn((
-        SpriteBundle {
+    commands.spawn(ShipBundle {
+        sprite_bundle: SpriteBundle {
             // transform: Transform::from_xyz(0., 0., 1.),
             transform: *ship_menu_location,
             texture: space_sheet.sheet.clone(),
             ..default()
         },
-        TextureAtlas {
+        texture_atlas: TextureAtlas {
             index: ship_type.base_atlas_index(),
             layout: space_sheet
                 .texture_atlas_layout
                 .clone(),
         },
-        Player,
-        ship_type.clone(),
-        WrappingMovement,
-    ));
+        player: Player,
+        ship_type: ship_type.clone(),
+        collider: ship_type.collider(),
+        wrapping_movement: WrappingMovement,
+    });
 
     commands.spawn(MeteorBundle::big(
         Transform::from_xyz(50., 0., 1.),
@@ -120,6 +123,47 @@ pub fn laser_meteor_collision(
                             destroyed_type: *meteor_type,
                         },
                     );
+                }
+            }
+        }
+    }
+}
+
+pub fn ship_meteor_collision(
+    mut commands: Commands,
+    mut ship_destroyed: EventWriter<ShipDestroyed>,
+    meteors: Query<Entity, With<Meteor>>,
+    player_ship: Query<
+        (
+            Entity,
+            &CollidingEntities,
+            &Transform,
+            &PlayerShipType,
+        ),
+        With<Player>,
+    >,
+) {
+    for (
+        entity_player,
+        colliding_entities,
+        transform,
+        ship_type,
+    ) in &player_ship
+    {
+        if !colliding_entities.is_empty() {
+            for entity_meteor in &meteors {
+                if colliding_entities
+                    .contains(&entity_meteor)
+                {
+                    commands
+                        .entity(entity_player)
+                        .despawn_recursive();
+
+                    // TODO: Send Ship Destroyed Event
+                    ship_destroyed.send(ShipDestroyed {
+                        destroyed_at: *transform,
+                        ship_type: ship_type.clone(),
+                    });
                 }
             }
         }

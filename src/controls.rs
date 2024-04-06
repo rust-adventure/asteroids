@@ -30,7 +30,7 @@ impl Plugin for ControlsPlugin {
 pub struct Laser(Vec2);
 
 #[derive(Resource, Default, Deref, DerefMut)]
-struct MovementFactor(Vec2);
+pub struct MovementFactor(pub Vec2);
 
 fn laser_movement(
     mut lasers: Query<(&mut Transform, &Laser)>,
@@ -102,7 +102,8 @@ fn player_movement_system(
     if keyboard_input.pressed(KeyCode::Space) {
         let can_shoot = last_shot.is_none() || {
             if let Some(shot) = *last_shot {
-                time.elapsed() - shot > Duration::from_millis(200)
+                time.elapsed() - shot
+                    > Duration::from_millis(200)
             } else {
                 false
             }
