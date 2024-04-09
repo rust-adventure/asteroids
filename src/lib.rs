@@ -159,7 +159,6 @@ pub fn ship_meteor_collision(
                         .entity(entity_player)
                         .despawn_recursive();
 
-                    // TODO: Send Ship Destroyed Event
                     ship_destroyed.send(ShipDestroyed {
                         destroyed_at: *transform,
                         ship_type: ship_type.clone(),

@@ -95,14 +95,11 @@ fn player_ship_destroyed_event_handler(
     images: Res<ImageAssets>,
     mut events: EventReader<ShipDestroyed>,
     sheets: Res<Assets<KenneySpriteSheetAsset>>,
-    mut effect: Query<
-        (
-            &mut EffectProperties,
-            &mut EffectSpawner,
-            &mut Transform,
-        ),
-        // Without<Ball>,
-    >,
+    mut effect: Query<(
+        &mut EffectProperties,
+        &mut EffectSpawner,
+        &mut Transform,
+    )>,
     mut ship_movement: ResMut<MovementFactor>,
     mut life_events: EventWriter<RemoveLifeEvent>,
 ) {
@@ -112,9 +109,6 @@ fn player_ship_destroyed_event_handler(
         return;
     };
 
-    let mut rng = rand::thread_rng();
-    // Note: On first frame where the effect spawns, EffectSpawner is spawned during
-    // PostUpdate, so will not be available yet. Ignore for a frame if so.
     let Ok((
         mut properties,
         mut spawner,
@@ -133,24 +127,17 @@ fn player_ship_destroyed_event_handler(
         effect_transform.translation =
             destroyed_at.translation;
 
-        // Pick a random particle color
-        let r = rand::random::<u8>();
-        let g = rand::random::<u8>();
-        let b = rand::random::<u8>();
-        let color = 0xFF000000u32
-            | (b as u32) << 16
-            | (g as u32) << 8
-            | (r as u32);
+        let color = Color::lch(
+            1.,
+            1.,
+            rand::random::<f32>() * 360.,
+        )
+        .as_linear_rgba_u32();
         properties.set("spawn_color", color.into());
 
-        // Set the collision normal
-        let normal = Vec2::Y.normalize();
-        info!("Collision: n={:?}", normal);
-        properties.set("normal", normal.extend(0.).into());
         // Spawn the particles
         spawner.reset();
 
-        // TODO: spawn ship
         ship_movement.0 = Vec2::ZERO;
 
         life_events.send(RemoveLifeEvent);
