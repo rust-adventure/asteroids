@@ -17,6 +17,8 @@ impl Plugin for ControlsPlugin {
             (
                 player_movement_system
                     .run_if(in_state(GameState::Playing)),
+                weapon_system
+                    .run_if(in_state(GameState::Playing)),
                 laser_movement,
             )
                 .run_if(resource_equals(
@@ -52,52 +54,26 @@ fn laser_movement(
     }
 }
 
-fn player_movement_system(
+fn weapon_system(
     mut commands: Commands,
     time: Res<Time>,
     keyboard_input: Res<ButtonInput<KeyCode>>,
-    mut query: Query<
-        (&mut Transform, &PlayerShipType),
-        With<Player>,
-    >,
-    mut movement_factor: ResMut<MovementFactor>,
+    query: Query<&Transform, With<Player>>,
+    movement_factor: ResMut<MovementFactor>,
     images: Res<ImageAssets>,
     sheets: Res<Assets<KenneySpriteSheetAsset>>,
     mut last_shot: Local<Option<Duration>>,
 ) {
-    let Ok((mut transform, ship)) = query.get_single_mut()
-    else {
+    let space_sheet =
+        sheets.get(&images.space_sheet).unwrap();
+
+    let Ok(transform) = query.get_single() else {
         error!(
             "Only expected one Player component. got {}",
             query.iter().count()
         );
         return;
     };
-    let space_sheet =
-        sheets.get(&images.space_sheet).unwrap();
-    let mut rotation_factor = 0.0;
-
-    if keyboard_input.pressed(KeyCode::ArrowLeft) {
-        rotation_factor += 1.0;
-    }
-
-    if keyboard_input.pressed(KeyCode::ArrowRight) {
-        rotation_factor -= 1.0;
-    }
-
-    // update the ship rotation around the Z axis
-    // (perpendicular to the 2D plane of the screen)
-    transform.rotate_z(
-        rotation_factor
-            * ship.base_ship_speed().rotation_speed
-            * time.delta_seconds(),
-    );
-
-    // get the ship's forward vector by applying the
-    // current rotation to the ships initial facing
-    // vector
-    let user_facing_direction =
-        transform.rotation * Vec3::Y;
 
     if keyboard_input.pressed(KeyCode::Space) {
         let can_shoot = last_shot.is_none() || {
@@ -133,6 +109,48 @@ fn player_movement_system(
             ));
         }
     }
+}
+fn player_movement_system(
+    time: Res<Time>,
+    keyboard_input: Res<ButtonInput<KeyCode>>,
+    mut query: Query<
+        (&mut Transform, &PlayerShipType),
+        With<Player>,
+    >,
+    mut movement_factor: ResMut<MovementFactor>,
+) {
+    let Ok((mut transform, ship)) = query.get_single_mut()
+    else {
+        error!(
+            "Only expected one Player component. got {}",
+            query.iter().count()
+        );
+        return;
+    };
+
+    let mut rotation_factor = 0.0;
+
+    if keyboard_input.pressed(KeyCode::ArrowLeft) {
+        rotation_factor += 1.0;
+    }
+
+    if keyboard_input.pressed(KeyCode::ArrowRight) {
+        rotation_factor -= 1.0;
+    }
+
+    // update the ship rotation around the Z axis
+    // (perpendicular to the 2D plane of the screen)
+    transform.rotate_z(
+        rotation_factor
+            * ship.base_ship_speed().rotation_speed
+            * time.delta_seconds(),
+    );
+
+    // get the ship's forward vector by applying the
+    // current rotation to the ships initial facing
+    // vector
+    let user_facing_direction =
+        transform.rotation * Vec3::Y;
 
     if keyboard_input.pressed(KeyCode::ArrowUp) {
         movement_factor.0 = (movement_factor.0
