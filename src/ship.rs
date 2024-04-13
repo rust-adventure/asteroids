@@ -59,6 +59,13 @@ impl PlayerShipType {
             PlayerShipType::C => 214,
         }
     }
+    pub fn life_atlas_index(&self) -> usize {
+        match &self {
+            PlayerShipType::A => 188,
+            PlayerShipType::B => 192,
+            PlayerShipType::C => 196,
+        }
+    }
     pub fn all_ships() -> Vec<PlayerShipType> {
         vec![
             PlayerShipType::A,
