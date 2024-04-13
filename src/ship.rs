@@ -24,6 +24,10 @@ impl Plugin for ShipPlugin {
         .add_event::<ShipDestroyed>();
     }
 }
+
+#[derive(Component)]
+pub struct PlayerEngineFire;
+
 #[derive(Event)]
 pub struct ShipDestroyed {
     pub destroyed_at: Transform,

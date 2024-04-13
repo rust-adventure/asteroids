@@ -7,7 +7,10 @@ use meteors::{
     Meteor, MeteorBundle, MeteorDestroyed, MeteorType,
 };
 use movement::WrappingMovement;
-use ship::{PlayerShipType, ShipBundle, ShipDestroyed};
+use ship::{
+    PlayerEngineFire, PlayerShipType, ShipBundle,
+    ShipDestroyed,
+};
 use ui::choose_ship::ChooseShipEvent;
 
 pub mod assets;
@@ -59,24 +62,49 @@ pub fn start_game(
     let space_sheet =
         sheets.get(&images.space_sheet).unwrap();
 
-    commands.spawn(ShipBundle {
-        sprite_bundle: SpriteBundle {
-            // transform: Transform::from_xyz(0., 0., 1.),
-            transform: *ship_menu_location,
-            texture: space_sheet.sheet.clone(),
-            ..default()
-        },
-        texture_atlas: TextureAtlas {
-            index: ship_type.base_atlas_index(),
-            layout: space_sheet
-                .texture_atlas_layout
-                .clone(),
-        },
-        player: Player,
-        ship_type: ship_type.clone(),
-        collider: ship_type.collider(),
-        wrapping_movement: WrappingMovement,
-    });
+    let engine_fire = commands
+        .spawn((
+            SpriteBundle {
+                transform: Transform::from_xyz(
+                    0., -60., 1.,
+                ),
+                texture: space_sheet.sheet.clone(),
+                sprite: Sprite {
+                    flip_y: true,
+                    ..default()
+                },
+                visibility: Visibility::Hidden,
+                ..default()
+            },
+            TextureAtlas {
+                index: 74,
+                layout: space_sheet
+                    .texture_atlas_layout
+                    .clone(),
+            },
+            PlayerEngineFire,
+        ))
+        .id();
+    commands
+        .spawn(ShipBundle {
+            sprite_bundle: SpriteBundle {
+                // transform: Transform::from_xyz(0., 0., 1.),
+                transform: *ship_menu_location,
+                texture: space_sheet.sheet.clone(),
+                ..default()
+            },
+            texture_atlas: TextureAtlas {
+                index: ship_type.base_atlas_index(),
+                layout: space_sheet
+                    .texture_atlas_layout
+                    .clone(),
+            },
+            player: Player,
+            ship_type: ship_type.clone(),
+            collider: ship_type.collider(),
+            wrapping_movement: WrappingMovement,
+        })
+        .add_child(engine_fire);
 
     commands.spawn(MeteorBundle::big(
         Transform::from_xyz(50., 0., 1.),

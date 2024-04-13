@@ -1,8 +1,9 @@
 use crate::{
     assets::ImageAssets,
     kenney_assets::KenneySpriteSheetAsset,
-    ship::PlayerShipType, ui::pause::Pausable, GameState,
-    Player,
+    ship::{PlayerEngineFire, PlayerShipType},
+    ui::pause::Pausable,
+    GameState, Player,
 };
 use bevy::prelude::*;
 use bevy_xpbd_2d::prelude::*;
@@ -18,6 +19,8 @@ impl Plugin for ControlsPlugin {
                 player_movement_system
                     .run_if(in_state(GameState::Playing)),
                 weapon_system
+                    .run_if(in_state(GameState::Playing)),
+                engine_fire
                     .run_if(in_state(GameState::Playing)),
                 laser_movement,
             )
@@ -107,6 +110,24 @@ fn weapon_system(
                     Vec2::new(-4.5, 27.),
                 ),
             ));
+        }
+    }
+}
+
+fn engine_fire(
+    mut query: Query<
+        &mut Visibility,
+        With<PlayerEngineFire>,
+    >,
+    keyboard_input: Res<ButtonInput<KeyCode>>,
+) {
+    if keyboard_input.pressed(KeyCode::ArrowUp) {
+        for mut visibility in query.iter_mut() {
+            *visibility = Visibility::Visible;
+        }
+    } else {
+        for mut visibility in query.iter_mut() {
+            *visibility = Visibility::Hidden;
         }
     }
 }
