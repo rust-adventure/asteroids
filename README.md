@@ -6,4 +6,4 @@ This is a work-in-progress implementation of Asteroids in Bevy. Some modificatio
 
 ![choose_ship](readme/choose_ship.avif)
 
-![gameplay](readme/gameplay.avif)
+![gameplay](readme/particles-and-lives.avif)
