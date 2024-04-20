@@ -3,10 +3,13 @@ use bevy_hanabi::prelude::*;
 use bevy_xpbd_2d::prelude::*;
 
 use crate::{
-    assets::ImageAssets, controls::MovementFactor,
+    assets::ImageAssets,
+    controls::MovementFactor,
     kenney_assets::KenneySpriteSheetAsset,
-    lives::RemoveLifeEvent, movement::WrappingMovement,
-    ui::pause::Pausable, GameState, Player,
+    lives::{Lives, RemoveLifeEvent},
+    movement::WrappingMovement,
+    ui::pause::Pausable,
+    GameState, Player,
 };
 
 pub struct ShipPlugin;
@@ -20,6 +23,15 @@ impl Plugin for ShipPlugin {
                     Pausable::NotPaused,
                 ))
                 .run_if(in_state(GameState::Playing)),
+        )
+        .add_systems(
+            PostUpdate,
+            spawn_ship_after_ship_destroyed
+                // if lives have changed and is not 0
+                // .run_if(resource_changed::<Lives>)
+                .run_if(not(resource_equals(Lives(0))))
+                // if ship was just destroyed
+                .run_if(on_event::<ShipDestroyed>()),
         )
         .add_event::<ShipDestroyed>();
     }
@@ -152,51 +164,66 @@ fn player_ship_destroyed_event_handler(
         ship_movement.0 = Vec2::ZERO;
 
         life_events.send(RemoveLifeEvent);
-
-        let engine_fire = commands
-            .spawn((
-                SpriteBundle {
-                    transform: Transform::from_xyz(
-                        0., -60., 1.,
-                    ),
-                    texture: space_sheet.sheet.clone(),
-                    sprite: Sprite {
-                        flip_y: true,
-                        ..default()
-                    },
-                    visibility: Visibility::Hidden,
-                    ..default()
-                },
-                TextureAtlas {
-                    index: 74,
-                    layout: space_sheet
-                        .texture_atlas_layout
-                        .clone(),
-                },
-                PlayerEngineFire,
-            ))
-            .id();
-
-        commands
-            .spawn(ShipBundle {
-                sprite_bundle: SpriteBundle {
-                    transform: Transform::from_xyz(
-                        0., 0., 1.,
-                    ),
-                    texture: space_sheet.sheet.clone(),
-                    ..default()
-                },
-                texture_atlas: TextureAtlas {
-                    index: ship_type.base_atlas_index(),
-                    layout: space_sheet
-                        .texture_atlas_layout
-                        .clone(),
-                },
-                player: Player,
-                ship_type: ship_type.clone(),
-                collider: ship_type.collider(),
-                wrapping_movement: WrappingMovement,
-            })
-            .add_child(engine_fire);
     }
+}
+
+fn spawn_ship_after_ship_destroyed(
+    mut commands: Commands,
+    images: Res<ImageAssets>,
+    mut events: EventReader<ShipDestroyed>,
+    sheets: Res<Assets<KenneySpriteSheetAsset>>,
+) {
+    info!("spawn_ship_after_ship_destroyed");
+    let Some(space_sheet) = sheets.get(&images.space_sheet)
+    else {
+        warn!("player_ship_destroyed_event_handler requires meteor sprites to be loaded");
+        return;
+    };
+
+    // TODO: remove ship_type
+    let ship_type = PlayerShipType::C;
+
+    let engine_fire = commands
+        .spawn((
+            SpriteBundle {
+                transform: Transform::from_xyz(
+                    0., -60., 1.,
+                ),
+                texture: space_sheet.sheet.clone(),
+                sprite: Sprite {
+                    flip_y: true,
+                    ..default()
+                },
+                visibility: Visibility::Hidden,
+                ..default()
+            },
+            TextureAtlas {
+                index: 74,
+                layout: space_sheet
+                    .texture_atlas_layout
+                    .clone(),
+            },
+            PlayerEngineFire,
+        ))
+        .id();
+
+    commands
+        .spawn(ShipBundle {
+            sprite_bundle: SpriteBundle {
+                transform: Transform::from_xyz(0., 0., 1.),
+                texture: space_sheet.sheet.clone(),
+                ..default()
+            },
+            texture_atlas: TextureAtlas {
+                index: ship_type.base_atlas_index(),
+                layout: space_sheet
+                    .texture_atlas_layout
+                    .clone(),
+            },
+            player: Player,
+            ship_type: ship_type.clone(),
+            collider: ship_type.collider(),
+            wrapping_movement: WrappingMovement,
+        })
+        .add_child(engine_fire);
 }

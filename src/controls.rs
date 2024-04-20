@@ -71,7 +71,7 @@ fn weapon_system(
         sheets.get(&images.space_sheet).unwrap();
 
     let Ok(transform) = query.get_single() else {
-        error!(
+        error_once!(
             "Only expected one Player component. got {}",
             query.iter().count()
         );
@@ -142,7 +142,7 @@ fn player_movement_system(
 ) {
     let Ok((mut transform, ship)) = query.get_single_mut()
     else {
-        error!(
+        error_once!(
             "Only expected one Player component. got {}",
             query.iter().count()
         );
