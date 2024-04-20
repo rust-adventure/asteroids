@@ -3,6 +3,7 @@ use bevy::prelude::*;
 use bevy_xpbd_2d::prelude::*;
 use controls::Laser;
 use kenney_assets::KenneySpriteSheetAsset;
+use lives::Lives;
 use meteors::{
     Meteor, MeteorBundle, MeteorDestroyed, MeteorType,
 };
@@ -38,11 +39,23 @@ pub enum GameState {
 #[derive(Component)]
 pub struct Player;
 
-// TODO: rename to start_sandbox
+pub fn reset_game(
+    mut commands: Commands,
+    mut lives: ResMut<Lives>,
+    meteors: Query<Entity, With<MeteorType>>,
+) {
+    lives.0 = 3;
+    // reset lives count
+    for entity in &meteors {
+        commands.entity(entity).despawn_recursive();
+    }
+}
+
 pub fn start_game(
     mut commands: Commands,
     images: Res<ImageAssets>,
     sheets: Res<Assets<KenneySpriteSheetAsset>>,
+    mut player_ship_type_choice: ResMut<PlayerShipType>,
     // player_ship_type: Res<PlayerShipType>,
     // where the ship should spawn from before landing at
     // 0,0
@@ -59,6 +72,8 @@ pub fn start_game(
         warn!("No ChooseShipEvent coming from the menu; Check to make sure events are receivable.");
         return;
     };
+    *player_ship_type_choice = ship_type.clone();
+
     let space_sheet =
         sheets.get(&images.space_sheet).unwrap();
 
@@ -106,6 +121,7 @@ pub fn start_game(
         })
         .add_child(engine_fire);
 
+    // TODO: spawn meteors according to current Level
     commands.spawn(MeteorBundle::big(
         Transform::from_xyz(50., 0., 1.),
         space_sheet,

@@ -28,7 +28,7 @@ impl Plugin for LifePlugin {
     }
 }
 
-#[derive(Resource, PartialEq, Eq)]
+#[derive(Debug, Resource, PartialEq, Eq)]
 pub struct Lives(pub usize);
 
 #[derive(Event)]
@@ -92,10 +92,12 @@ fn render_lives(
     life_sprite_query: Query<(Entity, &LifeIndex)>,
 ) {
     let Ok(ship_type) = player_query.get_single() else {
-        error_once!(
+        if player_query.iter().count() > 1 {
+            error_once!(
             "Only expected one PlayerShipType component. got {}",
             player_query.iter().count()
         );
+        }
         return;
     };
 

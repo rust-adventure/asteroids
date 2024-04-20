@@ -16,24 +16,26 @@ pub struct ShipPlugin;
 
 impl Plugin for ShipPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(
-            PostUpdate,
-            player_ship_destroyed_event_handler
-                .run_if(resource_equals(
-                    Pausable::NotPaused,
-                ))
-                .run_if(in_state(GameState::Playing)),
-        )
-        .add_systems(
-            PostUpdate,
-            spawn_ship_after_ship_destroyed
+        app.insert_resource(PlayerShipType::B)
+            .add_systems(
+                PostUpdate,
+                player_ship_destroyed_event_handler
+                    .run_if(resource_equals(
+                        Pausable::NotPaused,
+                    ))
+                    .run_if(in_state(GameState::Playing)),
+            )
+            .add_systems(
+                PostUpdate,
+                spawn_ship_after_ship_destroyed
+                    .run_if(in_state(GameState::Playing)),
                 // if lives have changed and is not 0
                 // .run_if(resource_changed::<Lives>)
-                .run_if(not(resource_equals(Lives(0))))
+                // .run_if(not(resource_equals(Lives(0))))
                 // if ship was just destroyed
-                .run_if(on_event::<ShipDestroyed>()),
-        )
-        .add_event::<ShipDestroyed>();
+                // .run_if(on_event::<RemoveLifeEvent>()),
+            )
+            .add_event::<ShipDestroyed>();
     }
 }
 
@@ -56,7 +58,7 @@ pub struct ShipBundle {
     pub wrapping_movement: WrappingMovement,
 }
 
-#[derive(Component, Clone)]
+#[derive(Resource, Component, Clone)]
 pub enum PlayerShipType {
     A,
     B,
@@ -170,18 +172,18 @@ fn player_ship_destroyed_event_handler(
 fn spawn_ship_after_ship_destroyed(
     mut commands: Commands,
     images: Res<ImageAssets>,
-    mut events: EventReader<ShipDestroyed>,
     sheets: Res<Assets<KenneySpriteSheetAsset>>,
+    lives: Res<Lives>,
+    player_ship_type: Res<PlayerShipType>,
 ) {
-    info!("spawn_ship_after_ship_destroyed");
+    if !lives.is_changed() || lives.0 == 0 || lives.0 == 3 {
+        return;
+    }
     let Some(space_sheet) = sheets.get(&images.space_sheet)
     else {
         warn!("player_ship_destroyed_event_handler requires meteor sprites to be loaded");
         return;
     };
-
-    // TODO: remove ship_type
-    let ship_type = PlayerShipType::C;
 
     let engine_fire = commands
         .spawn((
@@ -215,14 +217,14 @@ fn spawn_ship_after_ship_destroyed(
                 ..default()
             },
             texture_atlas: TextureAtlas {
-                index: ship_type.base_atlas_index(),
+                index: player_ship_type.base_atlas_index(),
                 layout: space_sheet
                     .texture_atlas_layout
                     .clone(),
             },
             player: Player,
-            ship_type: ship_type.clone(),
-            collider: ship_type.collider(),
+            ship_type: player_ship_type.clone(),
+            collider: player_ship_type.collider(),
             wrapping_movement: WrappingMovement,
         })
         .add_child(engine_fire);

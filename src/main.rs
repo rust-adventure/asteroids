@@ -9,9 +9,9 @@ use bevy_hanabi::prelude::*;
 use bevy_xpbd_2d::prelude::*;
 use space_shooter::{
     assets::AssetsPlugin, controls::ControlsPlugin,
-    lives::LifePlugin, settings::SettingsPlugin,
-    ship::ShipPlugin, ship_meteor_collision, ui::UiPlugin,
-    GameState,
+    lives::LifePlugin, reset_game,
+    settings::SettingsPlugin, ship::ShipPlugin,
+    ship_meteor_collision, ui::UiPlugin, GameState,
 };
 use space_shooter::{
     laser_meteor_collision,
@@ -66,7 +66,7 @@ fn main() {
         .add_systems(Startup, setup)
         .add_systems(
             OnEnter(GameState::Playing),
-            start_game,
+            (reset_game, start_game).chain(),
         )
         .add_systems(
             Update,
