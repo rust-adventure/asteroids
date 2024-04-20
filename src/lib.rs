@@ -1,5 +1,5 @@
 use assets::ImageAssets;
-use bevy::prelude::*;
+use bevy::{prelude::*, window::PrimaryWindow};
 use bevy_xpbd_2d::prelude::*;
 use controls::Laser;
 use kenney_assets::KenneySpriteSheetAsset;
@@ -8,6 +8,7 @@ use meteors::{
     Meteor, MeteorBundle, MeteorDestroyed, MeteorType,
 };
 use movement::WrappingMovement;
+use rand::Rng;
 use ship::{
     PlayerEngineFire, PlayerShipType, ShipBundle,
     ShipDestroyed,
@@ -63,7 +64,13 @@ pub fn start_game(
     mut choose_ship_reader: EventReader<
         ui::choose_ship::ChooseShipEvent,
     >,
+    window: Query<&Window, With<PrimaryWindow>>,
 ) {
+    let Ok(window) = window.get_single() else {
+        warn!("no primary window, can't start game");
+        return;
+    };
+
     let Some(ChooseShipEvent {
         ship_type,
         ship_menu_location,
@@ -121,9 +128,18 @@ pub fn start_game(
         })
         .add_child(engine_fire);
 
+    let width = window.resolution.width() / 2.;
+    let height = window.resolution.height() / 2.;
+
+    let mut rng = rand::thread_rng();
     // TODO: spawn meteors according to current Level
+    // TODO: Make sure meteors don't spawn on ships
     commands.spawn(MeteorBundle::big(
-        Transform::from_xyz(50., 0., 1.),
+        Transform::from_xyz(
+            rng.gen_range(-width..width),
+            rng.gen_range(-height..height),
+            1.,
+        ),
         space_sheet,
     ));
 }
