@@ -62,7 +62,17 @@ struct LifeIndex(usize);
 struct LifeContainer;
 
 fn spawn_life_ui(mut commands: Commands) {
-    commands.spawn((NodeBundle::default(), LifeContainer));
+    commands.spawn((
+        NodeBundle {
+            style: Style {
+                padding: UiRect::all(Val::Px(20.)),
+                column_gap: Val::Px(10.),
+                ..default()
+            },
+            ..default()
+        },
+        LifeContainer,
+    ));
 }
 fn remove_life_ui(
     mut commands: Commands,
@@ -109,10 +119,6 @@ fn render_lives(
                             .sheet
                             .clone()
                             .into(),
-                        style: Style {
-                            // border: UiRect::all(Val::Px(10.0)),
-                            ..default()
-                        },
                         ..default()
                     },
                     TextureAtlas {

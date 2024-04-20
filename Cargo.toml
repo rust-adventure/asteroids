@@ -15,5 +15,5 @@ bevy_hanabi = { version = "0.10.0", default-features = false, features = [
     "2d",
 ] }
 
-
-[features]
+[profile.dev.package."*"]
+opt-level = 3
