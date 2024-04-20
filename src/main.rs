@@ -9,7 +9,7 @@ use bevy_hanabi::prelude::*;
 use bevy_xpbd_2d::prelude::*;
 use space_shooter::{
     assets::AssetsPlugin, controls::ControlsPlugin,
-    lives::LifePlugin, reset_game,
+    levels::LevelsPlugin, lives::LifePlugin, reset_game,
     settings::SettingsPlugin, ship::ShipPlugin,
     ship_meteor_collision, ui::UiPlugin, GameState,
 };
@@ -61,6 +61,7 @@ fn main() {
             HanabiPlugin,
             ShipPlugin,
             LifePlugin,
+            LevelsPlugin,
         ))
         .init_state::<GameState>()
         .add_systems(Startup, setup)

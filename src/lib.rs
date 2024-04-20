@@ -3,6 +3,7 @@ use bevy::{prelude::*, window::PrimaryWindow};
 use bevy_xpbd_2d::prelude::*;
 use controls::Laser;
 use kenney_assets::KenneySpriteSheetAsset;
+use levels::Level;
 use lives::Lives;
 use meteors::{
     Meteor, MeteorBundle, MeteorDestroyed, MeteorType,
@@ -19,6 +20,7 @@ pub mod assets;
 pub mod colors;
 pub mod controls;
 pub mod kenney_assets;
+pub mod levels;
 pub mod lives;
 pub mod meteors;
 pub mod movement;
@@ -44,8 +46,10 @@ pub fn reset_game(
     mut commands: Commands,
     mut lives: ResMut<Lives>,
     meteors: Query<Entity, With<MeteorType>>,
+    mut level: ResMut<Level>,
 ) {
     lives.0 = 3;
+    *level = Level::default();
     // reset lives count
     for entity in &meteors {
         commands.entity(entity).despawn_recursive();

@@ -241,7 +241,7 @@ fn sandbox_meteor_destroyed_event_handler(
     mut commands: Commands,
     images: Res<ImageAssets>,
     mut events: EventReader<MeteorDestroyed>,
-    windows: Query<&Window>,
+    // meteors: Query<Entity, With<MeteorType>>,
     sheets: Res<Assets<KenneySpriteSheetAsset>>,
     mut effect: Query<(
         &mut EffectProperties,
@@ -249,13 +249,6 @@ fn sandbox_meteor_destroyed_event_handler(
         &mut Transform,
     )>,
 ) {
-    let Ok(window) = windows.get_single() else {
-        warn!("sandbox_meteor_destroyed_event_handler requires a window to spawn, but no window was found (or multiple were found)");
-        return;
-    };
-    let width = window.resolution.width();
-    let height = window.resolution.height();
-
     let Some(space_sheet) = sheets.get(&images.space_sheet)
     else {
         warn!("sandbox_meteor_destroyed_event_handler requires meteor sprites to be loaded");
@@ -332,20 +325,7 @@ fn sandbox_meteor_destroyed_event_handler(
                 }
             }
             MeteorType::Small => {
-                // do nothing
-                let x: i32 = rng.gen_range(
-                    (-width as i32 / 2)..(width as i32 / 2),
-                );
-                let y: i32 = rng.gen_range(
-                    (-height as i32 / 2)
-                        ..(height as i32 / 2),
-                );
-                commands.spawn(MeteorBundle::big(
-                    Transform::from_xyz(
-                        x as f32, y as f32, 1.,
-                    ),
-                    space_sheet,
-                ));
+                // small meteors don't propogate more meteors
             }
         }
     }
