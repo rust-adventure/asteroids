@@ -11,7 +11,8 @@ use thiserror::Error;
 
 /// Kenney makes [amazing assets](https://kenney.nl/).
 ///
-/// Often these assets come with a spritesheet and an xml file describing said spritesheet.
+/// Often these assets come with a spritesheet and
+/// an xml file describing said spritesheet.
 pub struct KenneyAssetPlugin;
 
 impl Plugin for KenneyAssetPlugin {
@@ -41,7 +42,8 @@ pub struct KenneySpriteSheetAsset {
 #[derive(Default)]
 pub struct KenneySpriteSheetAssetLoader;
 
-/// Possible errors that can be produced by [`KenneySpriteSheetAssetLoader`]
+/// Possible errors that can be produced by
+/// [`KenneySpriteSheetAssetLoader`]
 #[non_exhaustive]
 #[derive(Debug, Error)]
 pub enum KenneySpriteSheetAssetLoaderError {

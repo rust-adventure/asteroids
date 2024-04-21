@@ -184,8 +184,7 @@ fn player_movement_system(
     } else {
         // decay movement factor?
         // movement_factor.0 = (movement_factor.0
-        // * 0.95)
-        //     .clamp(Vec2::splat(-1.0),
+        // * 0.95) .clamp(Vec2::splat(-1.0),
         // Vec2::splat(1.0));
     }
     // get the distance the ship will move based on

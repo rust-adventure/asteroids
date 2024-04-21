@@ -47,7 +47,8 @@ fn main() {
                 .set(RenderPlugin {
                     render_creation: wgpu_settings.into(),
                     synchronous_pipeline_compilation: false,
-                }),
+                })
+                .set(ImagePlugin::default_nearest()),
             SettingsPlugin,
             ControlsPlugin,
             AssetsPlugin,

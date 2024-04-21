@@ -111,7 +111,8 @@ fn render_lives(
         if life_sprite_query.iter().any(
             |(_entity, life_index)| index == life_index.0,
         ) {
-            // life already exists on screen, and should, continue;
+            // life already exists on screen, and should,
+            // continue;
             continue;
         } else {
             let next_life = commands

@@ -256,8 +256,10 @@ fn sandbox_meteor_destroyed_event_handler(
     };
 
     let mut rng = rand::thread_rng();
-    // Note: On first frame where the effect spawns, EffectSpawner is spawned during
-    // PostUpdate, so will not be available yet. Ignore for a frame if so.
+    // Note: On first frame where the effect spawns,
+    // EffectSpawner is spawned during PostUpdate,
+    // so will not be available yet. Ignore for a
+    // frame if so.
     let Ok((
         mut properties,
         mut spawner,
@@ -325,7 +327,8 @@ fn sandbox_meteor_destroyed_event_handler(
                 }
             }
             MeteorType::Small => {
-                // small meteors don't propogate more meteors
+                // small meteors don't propogate
+                // more meteors
             }
         }
     }

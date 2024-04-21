@@ -26,9 +26,12 @@ fn setup(
     state.handle = asset_server
         .load("spaceShooter2_spritesheet_2X.xml");
 
-    // File extensions are optional, but are recommended for project management and last-resort inference
+    // File extensions are optional, but are
+    // recommended for project management and
+    // last-resort inference
     // state.other_handle =
-    //     asset_server.load("data/asset_no_extension");
+    //     asset_server.load("data/
+    // asset_no_extension");
 }
 
 fn print_on_load(

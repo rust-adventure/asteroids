@@ -30,8 +30,8 @@ pub fn text_button_system(
     mut interaction_query: Query<
         (
             &Interaction,
-            // in 0.14, BackgroundColor is no longer used for tinting
-            // https://github.com/bevyengine/bevy/pull/11165
+            // in 0.14, BackgroundColor is no longer used
+            // for tinting https://github.com/bevyengine/bevy/pull/11165
             &mut BackgroundColor,
             &Children,
         ),
@@ -152,7 +152,8 @@ impl<T: Into<String> + Send + 'static> Command
                         align_items: AlignItems::Center,
                         ..default()
                     },
-                    // background_color: NORMAL_BUTTON.into(),
+                    // background_color:
+                    // NORMAL_BUTTON.into(),
                     image: space_sheet.sheet.clone().into(),
                     ..default()
                 },

@@ -1,8 +1,5 @@
 use crate::{
-    assets::{
-        AudioAssets, FontAssets,
-        ImageAssets,
-    },
+    assets::{AudioAssets, FontAssets, ImageAssets},
     colors,
     settings::{AudioSettings, GameSettings},
     GameState,
@@ -21,16 +18,18 @@ impl Plugin for UiPlugin {
         app.insert_resource(MenuPage::Main)
             .add_systems(
                 OnExit(GameState::AssetLoading),
-                main_menu
+                main_menu,
             )
             .add_systems(
                 OnEnter(GameState::Menu),
                 show_menu,
             )
             .add_systems(OnExit(GameState::Menu), hide_menu)
-            .add_systems(Update,
-                button::text_button_system
-                    .run_if(not(in_state(GameState::AssetLoading)))
+            .add_systems(
+                Update,
+                button::text_button_system.run_if(not(
+                    in_state(GameState::AssetLoading),
+                )),
             )
             .add_systems(
                 Update,

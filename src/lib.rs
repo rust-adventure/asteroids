@@ -114,7 +114,8 @@ pub fn start_game(
     commands
         .spawn(ShipBundle {
             sprite_bundle: SpriteBundle {
-                // transform: Transform::from_xyz(0., 0., 1.),
+                // transform: Transform::from_xyz(0., 0.,
+                // 1.),
                 transform: *ship_menu_location,
                 texture: space_sheet.sheet.clone(),
                 ..default()
