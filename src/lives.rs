@@ -67,6 +67,8 @@ fn spawn_life_ui(mut commands: Commands) {
             style: Style {
                 padding: UiRect::all(Val::Px(20.)),
                 column_gap: Val::Px(10.),
+                position_type: PositionType::Absolute,
+                top: Val::Px(0.),
                 ..default()
             },
             ..default()

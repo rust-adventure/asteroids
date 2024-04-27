@@ -10,6 +10,7 @@ use meteors::{
 };
 use movement::WrappingMovement;
 use rand::Rng;
+use scores::Scores;
 use ship::{
     PlayerEngineFire, PlayerShipType, ShipBundle,
     ShipDestroyed,
@@ -48,12 +49,17 @@ pub fn reset_game(
     mut lives: ResMut<Lives>,
     meteors: Query<Entity, With<MeteorType>>,
     mut level: ResMut<Level>,
+    mut scores: ResMut<Scores>,
 ) {
     lives.0 = 3;
     *level = Level::default();
     // reset lives count
     for entity in &meteors {
         commands.entity(entity).despawn_recursive();
+    }
+    if scores.current > scores.high {
+        scores.high = scores.current;
+        scores.current = 0;
     }
 }
 
