@@ -33,8 +33,14 @@ fn score_meteors(
     mut scores: ResMut<Scores>,
     mut reader: EventReader<MeteorDestroyed>,
 ) {
-    for _meteor in reader.read() {
-        scores.current += 100;
+    for meteor in reader.read() {
+        let meteor_score_value = match meteor.destroyed_type
+        {
+            crate::meteors::MeteorType::Big => 20,
+            crate::meteors::MeteorType::Medium => 60,
+            crate::meteors::MeteorType::Small => 100,
+        };
+        scores.current += meteor_score_value;
     }
     // scores.current += reader.read().len() * 100;
     // info!("{:?}", scores);
@@ -72,12 +78,10 @@ fn spawn_scores_ui(mut commands: Commands) {
                 // background_color: Color::GREEN.into(),
                 style: Style {
                     padding: UiRect::all(Val::Px(20.)),
-                    display: Display::Flex,
                     position_type: PositionType::Absolute,
                     top: Val::Px(0.),
                     width: Val::Percent(100.),
                     justify_content: JustifyContent::Center,
-                    justify_items: JustifyItems::Center,
                     ..default()
                 },
                 ..default()
