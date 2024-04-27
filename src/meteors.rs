@@ -107,7 +107,7 @@ pub struct MeteorBundle {
     spin: Spin,
     wrapping: WrappingMovement,
 }
-#[derive(Component, Clone, Copy)]
+#[derive(Debug, Component, Clone, Copy)]
 pub enum MeteorType {
     Big,
     Medium,
@@ -231,7 +231,7 @@ impl MeteorBundle {
     }
 }
 
-#[derive(Event)]
+#[derive(Debug, Event)]
 pub struct MeteorDestroyed {
     pub destroyed_at: Transform,
     pub destroyed_type: MeteorType,

@@ -24,6 +24,7 @@ pub mod levels;
 pub mod lives;
 pub mod meteors;
 pub mod movement;
+pub mod scores;
 pub mod settings;
 pub mod ship;
 pub mod ui;

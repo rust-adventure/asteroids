@@ -10,8 +10,9 @@ use bevy_xpbd_2d::prelude::*;
 use space_shooter::{
     assets::AssetsPlugin, controls::ControlsPlugin,
     levels::LevelsPlugin, lives::LifePlugin, reset_game,
-    settings::SettingsPlugin, ship::ShipPlugin,
-    ship_meteor_collision, ui::UiPlugin, GameState,
+    scores::ScorePlugin, settings::SettingsPlugin,
+    ship::ShipPlugin, ship_meteor_collision, ui::UiPlugin,
+    GameState,
 };
 use space_shooter::{
     laser_meteor_collision,
@@ -49,20 +50,23 @@ fn main() {
                     synchronous_pipeline_compilation: false,
                 })
                 .set(ImagePlugin::default_nearest()),
-            SettingsPlugin,
-            ControlsPlugin,
-            AssetsPlugin,
-            UiPlugin,
             PhysicsPlugins::default(),
             PhysicsDebugPlugin::default(),
-            MeteorPlugin,
-            MovementPlugin,
-            ChooseShipPlugin,
-            PausePlugin,
             HanabiPlugin,
-            ShipPlugin,
-            LifePlugin,
-            LevelsPlugin,
+            (
+                SettingsPlugin,
+                ControlsPlugin,
+                AssetsPlugin,
+                UiPlugin,
+                MeteorPlugin,
+                MovementPlugin,
+                ChooseShipPlugin,
+                PausePlugin,
+                ShipPlugin,
+                LifePlugin,
+                LevelsPlugin,
+                ScorePlugin,
+            ),
         ))
         .init_state::<GameState>()
         .add_systems(Startup, setup)
