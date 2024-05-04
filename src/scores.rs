@@ -1,6 +1,8 @@
 use bevy::prelude::*;
 
-use crate::{meteors::MeteorDestroyed, GameState};
+use crate::{
+    meteors::MeteorDestroyed, ufo::UfoDestroyed, GameState,
+};
 
 pub struct ScorePlugin;
 
@@ -9,7 +11,7 @@ impl Plugin for ScorePlugin {
         app.init_resource::<Scores>()
             .add_systems(
                 Update,
-                (score_meteors, render_score)
+                (score_ufos, score_meteors, render_score)
                     .run_if(in_state(GameState::Playing)),
             )
             .add_systems(
@@ -42,8 +44,15 @@ fn score_meteors(
         };
         scores.current += meteor_score_value;
     }
-    // scores.current += reader.read().len() * 100;
-    // info!("{:?}", scores);
+}
+
+fn score_ufos(
+    mut scores: ResMut<Scores>,
+    mut reader: EventReader<UfoDestroyed>,
+) {
+    for _ufo in reader.read() {
+        scores.current += 500;
+    }
 }
 
 #[derive(Component)]

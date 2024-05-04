@@ -9,13 +9,14 @@ use bevy_hanabi::prelude::*;
 use bevy_xpbd_2d::prelude::*;
 use space_shooter::{
     assets::AssetsPlugin, controls::ControlsPlugin,
-    levels::LevelsPlugin, lives::LifePlugin, reset_game,
+    levels::LevelsPlugin, lives::LifePlugin,
+    meteor_laser_collision, reset_game,
     scores::ScorePlugin, settings::SettingsPlugin,
-    ship::ShipPlugin, ship_meteor_collision, ui::UiPlugin,
+    ship::ShipPlugin, ship_meteor_collision,
+    ufo::UfoPlugin, ufo_laser_collision, ui::UiPlugin,
     GameState,
 };
 use space_shooter::{
-    laser_meteor_collision,
     meteors::MeteorPlugin,
     movement::MovementPlugin,
     start_game,
@@ -66,6 +67,7 @@ fn main() {
                 LifePlugin,
                 LevelsPlugin,
                 ScorePlugin,
+                UfoPlugin,
             ),
         ))
         .init_state::<GameState>()
@@ -77,8 +79,9 @@ fn main() {
         .add_systems(
             Update,
             (
-                laser_meteor_collision,
+                meteor_laser_collision,
                 ship_meteor_collision,
+                ufo_laser_collision,
             )
                 .run_if(in_state(GameState::Playing))
                 .run_if(resource_equals(

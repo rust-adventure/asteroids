@@ -15,6 +15,7 @@ use ship::{
     PlayerEngineFire, PlayerShipType, ShipBundle,
     ShipDestroyed,
 };
+use ufo::{Ufo, UfoDestroyed};
 use ui::choose_ship::ChooseShipEvent;
 
 pub mod assets;
@@ -28,6 +29,7 @@ pub mod movement;
 pub mod scores;
 pub mod settings;
 pub mod ship;
+pub mod ufo;
 pub mod ui;
 
 #[derive(
@@ -47,14 +49,17 @@ pub struct Player;
 pub fn reset_game(
     mut commands: Commands,
     mut lives: ResMut<Lives>,
-    meteors: Query<Entity, With<MeteorType>>,
+    entities: Query<
+        Entity,
+        Or<(With<MeteorType>, With<Ufo>)>,
+    >,
     mut level: ResMut<Level>,
     mut scores: ResMut<Scores>,
 ) {
     lives.0 = 3;
     *level = Level::default();
     // reset lives count
-    for entity in &meteors {
+    for entity in &entities {
         commands.entity(entity).despawn_recursive();
     }
     if scores.current > scores.high {
@@ -156,7 +161,7 @@ pub fn start_game(
     ));
 }
 
-pub fn laser_meteor_collision(
+pub fn meteor_laser_collision(
     mut commands: Commands,
     mut meteor_destroyed: EventWriter<MeteorDestroyed>,
     lasers: Query<Entity, With<Laser>>,
@@ -201,10 +206,45 @@ pub fn laser_meteor_collision(
     }
 }
 
+pub fn ufo_laser_collision(
+    mut commands: Commands,
+    mut ufo_destroyed: EventWriter<UfoDestroyed>,
+    lasers: Query<Entity, With<Laser>>,
+    ufos: Query<
+        (Entity, &CollidingEntities, &Transform),
+        With<Ufo>,
+    >,
+) {
+    for (entity_meteor, colliding_entities, transform) in
+        &ufos
+    {
+        debug_once!("loop");
+        if !colliding_entities.is_empty() {
+            for entity_laser in &lasers {
+                if colliding_entities
+                    .contains(&entity_laser)
+                {
+                    debug!("hit");
+                    commands
+                        .entity(entity_laser)
+                        .despawn_recursive();
+                    commands
+                        .entity(entity_meteor)
+                        .despawn_recursive();
+
+                    ufo_destroyed.send(UfoDestroyed {
+                        destroyed_at: *transform,
+                    });
+                }
+            }
+        }
+    }
+}
+
 pub fn ship_meteor_collision(
     mut commands: Commands,
     mut ship_destroyed: EventWriter<ShipDestroyed>,
-    meteors: Query<Entity, With<Meteor>>,
+    meteors: Query<Entity, Or<(With<Meteor>, With<Ufo>)>>,
     player_ship: Query<
         (
             Entity,
