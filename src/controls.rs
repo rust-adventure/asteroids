@@ -32,7 +32,12 @@ impl Plugin for ControlsPlugin {
 }
 
 #[derive(Component)]
-pub struct Laser(Vec2);
+pub struct Laser{
+    /// movement factor is ship's movement speed at time of firing
+pub    movement_factor: Vec2,
+/// speed is laser's inherent movement speed
+pub speed: f32,
+}
 
 #[derive(Resource, Default, Deref, DerefMut)]
 pub struct MovementFactor(pub Vec2);
@@ -43,19 +48,25 @@ fn laser_movement(
 ) {
     for (
         mut transform,
-        Laser(preexisting_movement_factor),
+        Laser{
+            movement_factor,
+            speed
+        },
     ) in &mut lasers
     {
         let laser_facing_direction =
             transform.rotation * Vec3::Y;
-        let translation_delta = *preexisting_movement_factor
+        let translation_delta = *movement_factor
             + laser_facing_direction.xy()
-                * 1000.
+                * *speed
                 * time.delta_seconds();
         transform.translation.x += translation_delta.x;
         transform.translation.y += translation_delta.y;
     }
 }
+
+#[derive(Component)]
+pub struct PlayerOwned;
 
 fn weapon_system(
     mut commands: Commands,
@@ -105,7 +116,11 @@ fn weapon_system(
                         .clone(),
                     index: 105,
                 },
-                Laser(**movement_factor),
+                Laser{
+                    movement_factor: **movement_factor,
+                    speed: 1000.
+                },
+                PlayerOwned,
                 Collider::triangle(
                     Vec2::new(0., -27.),
                     Vec2::new(4.5, 27.),

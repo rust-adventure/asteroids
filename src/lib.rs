@@ -1,7 +1,7 @@
 use assets::ImageAssets;
 use bevy::{prelude::*, window::PrimaryWindow};
 use bevy_xpbd_2d::prelude::*;
-use controls::Laser;
+use controls::{Laser, PlayerOwned};
 use kenney_assets::KenneySpriteSheetAsset;
 use levels::Level;
 use lives::Lives;
@@ -15,7 +15,7 @@ use ship::{
     PlayerEngineFire, PlayerShipType, ShipBundle,
     ShipDestroyed,
 };
-use ufo::{Ufo, UfoDestroyed};
+use ufo::{Ufo, UfoDestroyed, UfoOwned};
 use ui::choose_ship::ChooseShipEvent;
 
 pub mod assets;
@@ -209,7 +209,7 @@ pub fn meteor_laser_collision(
 pub fn ufo_laser_collision(
     mut commands: Commands,
     mut ufo_destroyed: EventWriter<UfoDestroyed>,
-    lasers: Query<Entity, With<Laser>>,
+    lasers: Query<Entity, (With<Laser>, With<PlayerOwned>)>,
     ufos: Query<
         (Entity, &CollidingEntities, &Transform),
         With<Ufo>,
@@ -244,7 +244,14 @@ pub fn ufo_laser_collision(
 pub fn ship_meteor_collision(
     mut commands: Commands,
     mut ship_destroyed: EventWriter<ShipDestroyed>,
-    meteors: Query<Entity, Or<(With<Meteor>, With<Ufo>)>>,
+    meteors: Query<
+        Entity,
+        Or<(With<Meteor>, With<Ufo>, With<UfoOwned>)>,
+    >,
+    query_lasers: Query<
+        Entity,
+        (With<UfoOwned>, With<Laser>),
+    >,
     player_ship: Query<
         (
             Entity,
@@ -270,6 +277,14 @@ pub fn ship_meteor_collision(
                     commands
                         .entity(entity_player)
                         .despawn_recursive();
+
+                    if let Ok(laser_entity) =
+                        query_lasers.get(entity_meteor)
+                    {
+                        commands
+                            .entity(laser_entity)
+                            .despawn_recursive();
+                    };
 
                     ship_destroyed.send(ShipDestroyed {
                         destroyed_at: *transform,
