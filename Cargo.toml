@@ -4,15 +4,14 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-avian2d = "0.3"
-bevy = { version = "0.16", features = ["bevy_dev_tools"] }
-glam = { version = "0.29.3", features = ["rand"] }
+avian2d = "0.4"
+bevy = { version = "0.17", features = ["bevy_dev_tools"] }
 # Set max log levels. This helps avoid unwanted low-severity log spam, which can affect performance.
 log = { version = "0.4", features = [
     "max_level_debug",
     "release_max_level_warn",
 ] }
-rand = "0.8"
+rand = "0.9"
 tracing = { version = "0.1", features = [
     "max_level_debug",
     "release_max_level_warn",

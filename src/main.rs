@@ -2,9 +2,9 @@ use std::f32::consts::TAU;
 
 use avian2d::prelude::*;
 use bevy::{
-    color::palettes::tailwind::*,
+    camera::ScalingMode, color::palettes::tailwind::*,
     dev_tools::states::log_transitions, prelude::*,
-    render::camera::ScalingMode, window::PrimaryWindow,
+    window::PrimaryWindow,
 };
 
 const CANVAS_SIZE: Vec2 = Vec2::new(80., 10.);
@@ -51,7 +51,6 @@ fn main() -> AppExit {
 #[derive(
     Debug, Clone, Copy, Default, Eq, PartialEq, Hash, States,
 )]
-#[states(scoped_entities)]
 enum AppState {
     #[default]
     GameOver,
@@ -93,7 +92,7 @@ fn check_end_level(
 fn spawn_game_over(mut commands: Commands) {
     commands
         .spawn((
-            StateScoped(AppState::GameOver),
+            DespawnOnExit(AppState::GameOver),
             Button,
             Node {
                 width: Val::Percent(100.),
@@ -105,7 +104,7 @@ fn spawn_game_over(mut commands: Commands) {
             children![Text::new("New Game")],
         ))
         .observe(
-            |_trigger: Trigger<Pointer<Click>>,
+            |_: On<Pointer<Click>>,
              mut next_state: ResMut<
                 NextState<AppState>,
             >| {
@@ -118,7 +117,7 @@ fn spawn_game_over(mut commands: Commands) {
 struct SpawnShip;
 
 fn spawn_ship(
-    _trigger: Trigger<SpawnShip>,
+    _: On<SpawnShip>,
     mut commands: Commands,
     mut gizmo_assets: ResMut<Assets<GizmoAsset>>,
 ) {
@@ -154,7 +153,7 @@ fn spawn_ship(
                 handle: gizmo_assets.add(gizmo),
                 ..default()
             },
-            StateScoped(AppState::GameOver),
+            DespawnOnExit(AppState::GameOver),
             RigidBody::Dynamic,
             Collider::triangle(
                 ship.vertices[0],
@@ -162,7 +161,6 @@ fn spawn_ship(
                 ship.vertices[2],
             ),
             LinearVelocity::ZERO,
-            ExternalForce::ZERO.with_persistence(false),
             WrappingMovement,
             RotationSpeed(Rot2::degrees(180.)),
             children![(
@@ -184,7 +182,7 @@ fn spawn_ship(
             CollisionEventsEnabled,
         ))
         .observe(
-            |trigger: Trigger<OnCollisionStart>,
+            |trigger: On<CollisionStart>,
              mut lives: ResMut<Lives>,
              mut next_state: ResMut<
                 NextState<AppState>,
@@ -195,7 +193,9 @@ fn spawn_ship(
                     return;
                 };
                 lives.0 = n;
-                commands.entity(trigger.target()).despawn();
+                commands
+                    .entity(trigger.collider1)
+                    .despawn();
                 commands.trigger(SpawnShip);
             },
         );
@@ -269,10 +269,7 @@ fn wrapping_movement(
 }
 
 fn linear_movement(
-    ship: Single<
-        (&Transform, &mut ExternalForce),
-        With<Ship>,
-    >,
+    ship: Single<(&Transform, Forces), With<Ship>>,
     input: Res<ButtonInput<KeyCode>>,
     propulsion: Single<(Entity, &Propulsion, Has<Gizmo>)>,
     mut commands: Commands,
@@ -356,7 +353,7 @@ impl AsteroidSize {
     CollisionEventsEnabled,
     LinearVelocity,
     Transform,
-    StateScoped::<AppState>(AppState::GameOver)
+    DespawnOnExit::<AppState>(AppState::GameOver)
 )]
 struct Asteroid {
     size: AsteroidSize,
@@ -373,7 +370,7 @@ impl Asteroid {
 }
 
 fn spawn_level_asteroids(
-    _trigger: Trigger<SpawnLevel>,
+    _: On<SpawnLevel>,
     mut commands: Commands,
     window: Single<&Window, With<PrimaryWindow>>,
     camera: Single<(&Camera, &GlobalTransform)>,
@@ -391,12 +388,12 @@ fn spawn_level_asteroids(
     )?;
 
     for _ in 0..current_level.0 {
-        use rand::{Rng, thread_rng};
+        use rand::{Rng, rng};
 
-        let mut rng = thread_rng();
-        let velocity = rng.r#gen::<f32>() * 10.;
+        let mut rng = rng();
+        let velocity = rng.random::<f32>() * 10.;
         let angle =
-            Vec2::from_angle(rng.gen_range(0.0..TAU));
+            Vec2::from_angle(rng.random_range(0.0..TAU));
 
         commands.queue(SpawnAsteroid {
             asteroid: Asteroid {
@@ -408,10 +405,10 @@ fn spawn_level_asteroids(
             transform: Transform::from_xyz(
                 bottom_right
                     .x
-                    .lerp(top_left.x, rng.r#gen()),
+                    .lerp(top_left.x, rng.random()),
                 bottom_right
                     .y
-                    .lerp(top_left.y, rng.r#gen()),
+                    .lerp(top_left.y, rng.random()),
                 0.,
             ),
         });
@@ -460,26 +457,26 @@ impl Command for SpawnAsteroid {
 }
 
 fn observe_asteroid_collision(
-    trigger: Trigger<OnCollisionStart>,
+    trigger: On<CollisionStart>,
     asteroids: Query<(&Asteroid, &Transform)>,
     mut commands: Commands,
 ) {
     let Ok((asteroid, transform)) =
-        asteroids.get(trigger.target())
+        asteroids.get(trigger.collider1)
     else {
         return;
     };
     let num_asteroids_to_spawn = asteroid.to_fragments();
 
-    commands.entity(trigger.target()).despawn();
+    commands.entity(trigger.collider1).despawn();
 
     for _ in 0..num_asteroids_to_spawn {
-        use rand::{Rng, thread_rng};
+        use rand::{Rng, rng};
 
-        let mut rng = thread_rng();
-        let velocity = rng.r#gen::<f32>() * 10.;
+        let mut rng = rng();
+        let velocity = rng.random::<f32>() * 10.;
         let angle =
-            Vec2::from_angle(rng.gen_range(0.0..TAU));
+            Vec2::from_angle(rng.random_range(0.0..TAU));
 
         // push the new asteroid in the direction it will travel
         let mut new_transform = transform.clone();
@@ -539,7 +536,7 @@ fn fire(
     mut commands: Commands,
     ship: Single<&Transform, With<Ship>>,
 ) {
-    if !timer.0.tick(time.delta()).finished() {
+    if !timer.0.tick(time.delta()).is_finished() {
         return;
     }
 
@@ -578,10 +575,10 @@ fn fire(
                 CollisionEventsEnabled,
             ))
             .observe(
-                |trigger: Trigger<OnCollisionStart>,
+                |trigger: On<CollisionStart>,
                  mut commands: Commands| {
                     commands
-                        .entity(trigger.target())
+                        .entity(trigger.collider1)
                         .despawn();
                 },
             );
